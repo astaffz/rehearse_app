@@ -1,7 +1,11 @@
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rehearse_app/screens/login_screen.dart';
 import 'package:rehearse_app/screens/notebook_screen.dart';
-import 'package:rehearse_app/utils/styles.dart';
+import 'package:rehearse_app/screens/splash_screen.dart';
+import 'package:rehearse_app/services/auth.dart';
+import 'package:rehearse_app/shared/shared.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,56 +17,45 @@ class HomeScreen extends StatelessWidget {
     List<String> options = ["Moji zapisi", "Moji podsjetnici", "Moj reader"];
     final random = new Random();
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        primaryColor: accent,
-      ),
-      home: Scaffold(
-        backgroundColor: background,
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 20),
-              // APPBAR - "REHEARSEapp"
-              const RehearseAppBar(),
-              const SizedBox(
-                height: 80,
-              ),
-              // WELCOME MESSAGE
-              Padding(
-                padding: const EdgeInsets.fromLTRB(35.0, 20.0, 20.0, 20.0),
-                child: Text(
-                  welcomeMessages[random.nextInt(welcomeMessages.length)],
-                  style: heading2.copyWith(color: white),
-                  textAlign: TextAlign.left,
+    return StreamBuilder(
+      stream: AuthService().userStream,
+      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SplashScreen();
+        } else if (!snapshot.hasData) {
+          return const LoginScreen();
+        } else {
+          return Scaffold(
+            backgroundColor: icon.withAlpha(150),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                // APPBAR - "REHEARSEapp"
+                const RehearseAppBar(),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-              // OPTION-BOX
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 15, 20, 10),
-                child: OptionWidget(options: options),
-              ),
-
-              const Row(
-                children: [
-                  IconButton(
-                    onPressed: null,
-                    icon: Icon(
-                      Icons.question_mark_sharp,
-                      color: icon,
-                      weight: 10,
-                    ),
+                // WELCOME MESSAGE
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: Text(
+                    welcomeMessages[random.nextInt(welcomeMessages.length)],
+                    style: heading3.copyWith(color: white),
+                    textAlign: TextAlign.left,
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+                ),
+                // OPTION-BOX
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 15, 18, 0),
+                  child: OptionWidget(options: options),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
@@ -73,9 +66,17 @@ class RehearseAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: background,
-      leading: const Material(color: heading),
-      leadingWidth: 26,
+      backgroundColor: Colors.transparent,
+      leading: Container(
+        color: white,
+        width: small,
+        height: small,
+        child: Icon(
+          Icons.edit,
+          color: accent,
+          size: medium,
+        ),
+      ),
       title: Text("RehearseApp", style: heading2),
     );
   }
@@ -105,38 +106,36 @@ class OptionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20))),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       color: accentLight,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 15, 15, 20),
+        padding: const EdgeInsets.fromLTRB(8, 15, 0, 266),
         // COLUMN WITH OPTIONS
-        child: Expanded(
-          child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: options.length * 2,
-              itemBuilder: (context, index) {
-                final actualIndex = index ~/ 2;
-                if (!index.isEven) {
-                  return const Padding(
-                    padding: EdgeInsets.zero,
-                    child: dividerAccent,
-                  );
-                } else {
-                  final dataIndex = actualIndex;
-                  return ListTile(
-                    title: Text(options[dataIndex]),
-                    titleTextStyle: pBold.copyWith(color: black),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => getDestinationPage(dataIndex),
-                          ));
-                    },
-                  );
-                }
-              }),
-        ),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: options.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(options[index]),
+                trailing: Icon(
+                  Icons.arrow_circle_right_outlined,
+                  color: accent,
+                  size: medium,
+                ),
+                titleTextStyle: pBold.copyWith(color: black),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => getDestinationPage(index),
+                      ));
+                },
+              );
+            },
+          )
+        ]),
       ),
     );
   }

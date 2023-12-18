@@ -1,4 +1,4 @@
-package com.example.rehearse_app
+package com.gelegenheit.rehearseapp
 
 import io.flutter.embedding.android.FlutterActivity
 
