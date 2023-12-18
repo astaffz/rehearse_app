@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "941083888355",
+    "project_id": "rehearseapp-d9c43",
+    "storage_bucket": "rehearseapp-d9c43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941083888355:android:2942b42a6c2d313d8813d6",
+        "android_client_info": {
+          "package_name": "com.gelegenheit.rehearseapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZNR4FaRNrVBVMj0FGXPKmvnMga2zc2Mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

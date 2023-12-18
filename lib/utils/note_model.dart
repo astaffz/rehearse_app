@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rehearse_app/utils/styles.dart';
+import 'package:rehearse_app/shared/shared.dart';
 
 class NoteType {
   const NoteType({
@@ -18,22 +18,40 @@ class NoteType {
   final Color? headerBorderColor;
   final Color? headerBorderColorOpened;
   final Icon? leftIcon;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'category_id': categoryID,
+      '': name,
+    };
+  }
 }
 
 class Note with ChangeNotifier {
   Note({
+    required this.id,
     required this.term,
     required this.definition,
-    required this.category,
+    required this.categoryID,
   });
 
+  final int id;
   String term;
   String definition;
-  NoteType category;
+  int categoryID;
 
   List get elements {
-    final elements = [term, definition, category];
+    final elements = [term, definition, categoryID];
     return elements;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'term': term,
+      'definition': definition,
+      'category_id': categoryID,
+    };
   }
 }
 
@@ -57,46 +75,4 @@ void createCustomNoteType(Color hBC, String categoryName) {
     categoryID: categories.length,
     name: categoryName,
   ));
-}
-
-class NoteData with ChangeNotifier {
-  // ignore: prefer_final_fields
-  static List<Note> _notes = [
-    Note(
-      term: "Murphyjev zakon",
-      definition: "'Ako nešto može poći naopako, poći će naopako.'",
-      category: defaultType,
-    ),
-    Note(
-      term: "Marksizam",
-      definition:
-          "Marksizam je holistička i transdisciplinarna društvena znanost, teorija i politička djelatnost tj. praxis dobivena iz radova Karla Marxa i Friedricha Engelsa. ",
-      category: important,
-    ),
-  ];
-  void addNote(String term, String definition,
-      [NoteType category = defaultType]) {
-    _notes.add(Note(term: term, definition: definition, category: category));
-    notifyListeners();
-  }
-
-  List<Note> get notes => _notes;
-  void editNote(Note note, int elementID, var input) {
-    switch (elementID) {
-      case 0:
-        note.term = input;
-        break;
-      case 1:
-        note.definition = input;
-        break;
-      case 2:
-        note.category = input;
-    }
-    notifyListeners();
-  }
-
-  void deleteNote(Note note) {
-    notes.remove(note);
-    notifyListeners();
-  }
 }

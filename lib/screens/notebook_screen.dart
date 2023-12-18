@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rehearse_app/main.dart';
-import 'package:rehearse_app/utils/styles.dart';
+import 'package:rehearse_app/services/database_helper.dart';
+import 'package:rehearse_app/shared/shared.dart';
 import 'package:accordion/accordion.dart';
 import 'package:rehearse_app/utils/note_model.dart';
 import 'package:provider/provider.dart';
@@ -15,9 +16,13 @@ class NotebookScreen extends StatefulWidget {
 }
 
 class _NotebookScreenState extends State<NotebookScreen> {
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
   late TextEditingController controllerTerm;
   late TextEditingController controllerDefinition;
-
+  late Future<List<Note>> notesFuture = _databaseHelper.getNotesDatabase();
+  late Future<List<NoteType>> categoriesFuture =
+      _databaseHelper.getCategoriesDatabase();
+  List<Note> notes = [];
   @override
   void initState() {
     super.initState();
@@ -31,31 +36,55 @@ class _NotebookScreenState extends State<NotebookScreen> {
     super.dispose();
   }
 
+  void _update() {
+    setState(() {
+      notesFuture = _databaseHelper.getNotesDatabase();
+      notesFuture.then((notes) => this.notes = notes);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<NoteData>(
-        create: (_) => NoteData(),
-        builder: (context, child) {
-          return Scaffold(
-            backgroundColor: accentLight,
-            // ADD BUTTON
-            floatingActionButton: IconButton.filled(
-              icon: const Icon(Icons.add, color: icon),
-              onPressed: () async {
-                List dialogInputs = [];
-                dialogInputs = await openDialog() ?? [];
-                if (dialogInputs.isNotEmpty) {
-                  Provider.of<NoteData>(context, listen: false).addNote(
-                      dialogInputs[0], dialogInputs[1], dialogInputs[2]);
-                }
-              },
-              style: ButtonStyle(
-                  padding: MaterialStateProperty.resolveWith(
-                      (states) => const EdgeInsets.all(15)),
-                  backgroundColor:
-                      MaterialStateProperty.resolveWith((states) => white)),
-            ),
-            body: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: accentLight,
+      // ADD BUTTON
+      floatingActionButton: IconButton.filled(
+        icon: const Icon(Icons.add, color: icon),
+        onPressed: () async {
+          List dialogInputs = [];
+          dialogInputs = await openDialog() ?? [];
+          if (dialogInputs.isNotEmpty) {
+            _databaseHelper.insertNote(Note(
+                id: await _databaseHelper.notesRecordCount + 1,
+                term: dialogInputs[0],
+                definition: dialogInputs[1],
+                categoryID: dialogInputs[2]));
+            _update();
+          }
+        },
+        style: ButtonStyle(
+            padding: MaterialStateProperty.resolveWith(
+                (states) => const EdgeInsets.all(15)),
+            backgroundColor:
+                MaterialStateProperty.resolveWith((states) => white)),
+      ),
+      body: FutureBuilder(
+          future: notesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(
+                child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(
+                      color: accent,
+                    )),
+              );
+            } else if (snapshot.hasError) {
+              // return: show error widget
+            }
+            notes = snapshot.data ?? [];
+            return SingleChildScrollView(
               child: Column(
                 children: [
                   ListView(
@@ -99,22 +128,21 @@ class _NotebookScreenState extends State<NotebookScreen> {
                           paddingBetweenClosedSections: 5,
                           maxOpenSections: 2,
                           scaleWhenAnimating: false,
-                          children: createSections(
-                              Provider.of<NoteData>(context).notes, context),
+                          children: createSections(notes, context),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-          );
-        });
+            );
+          }),
+    );
   }
 
   Future openDialog([Note? note]) {
     Alignment dialogAlignment = Alignment.centerRight;
-
+    bool hasNote = false;
     if (note != null) {
       controllerTerm.text = note.term;
       controllerDefinition.text = note.definition;
@@ -123,126 +151,137 @@ class _NotebookScreenState extends State<NotebookScreen> {
       controllerTerm.clear();
       controllerDefinition.clear();
     }
-    NoteType? currentCategory = note?.category;
+
     return showDialog(
         context: context,
         builder: ((BuildContext context) {
           return ChangeNotifierProvider<DialogData>(
-            create: (context) => DialogData(),
-            builder: ((context, child) {
-              var headerColor = currentCategory?.headerBackgroundColor ??
-                  Provider.of<DialogData>(context, listen: true).dialogColor;
-              return AlertDialog(
-                  titlePadding: EdgeInsets.zero,
-                  alignment: dialogAlignment,
-                  backgroundColor: white,
-                  title: Container(
-                    margin: EdgeInsets.zero,
-                    decoration: ShapeDecoration(
-                      color: headerColor,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(width: 12, color: headerColor),
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
+              create: (_) => DialogData(),
+              builder: ((context, child) {
+                if (note != null && hasNote == false) {
+                  Provider.of<DialogData>(context).setDialog(note);
+                  hasNote = true;
+                }
+                return AlertDialog(
+                    titlePadding: EdgeInsets.zero,
+                    alignment: dialogAlignment,
+                    backgroundColor: white,
+                    title: Container(
+                      margin: EdgeInsets.zero,
+                      decoration: ShapeDecoration(
+                        color: Provider.of<DialogData>(context, listen: true)
+                            .dialogColor,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              width: 12,
+                              color:
+                                  Provider.of<DialogData>(context, listen: true)
+                                      .dialogColor),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
                         ),
                       ),
-                    ),
-                    padding: EdgeInsets.zero,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: controllerTerm,
-                            style: pBold,
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                              labelText: "Pojam:",
-                              labelStyle: p1.copyWith(color: white),
-                              focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: accent),
+                      padding: EdgeInsets.zero,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: controllerTerm,
+                              style: pBold,
+                              maxLines: 1,
+                              decoration: InputDecoration(
+                                labelText: "Pojam:",
+                                labelStyle: p1.copyWith(color: white),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: accent),
+                                ),
+                                enabledBorder: InputBorder.none,
+                                fillColor: black,
                               ),
-                              enabledBorder: InputBorder.none,
-                              fillColor: black,
                             ),
                           ),
-                        ),
-                        DropdownMenu<NoteType>(
-                          width: 40,
-                          trailingIcon: const Icon(null),
-                          selectedTrailingIcon: const Icon(null),
-                          leadingIcon: Icon(
-                            Provider.of<DialogData>(context, listen: false)
-                                .noteCategory
-                                .leftIcon
-                                ?.icon,
-                            color: white,
-                          ),
-                          enableSearch: false,
-                          initialSelection:
+                          DropdownMenu<NoteType>(
+                            width: 40,
+                            trailingIcon: const Icon(null),
+                            selectedTrailingIcon: const Icon(null),
+                            leadingIcon: Icon(
+                              Provider.of<DialogData>(context, listen: true)
+                                  .noteCategory
+                                  .leftIcon
+                                  ?.icon,
+                              color: white,
+                            ),
+                            enableSearch: false,
+                            initialSelection:
+                                Provider.of<DialogData>(context, listen: true)
+                                    .noteCategory,
+                            menuStyle: MenuStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith(
+                                        (states) => Provider.of<DialogData>(
+                                                context,
+                                                listen: true)
+                                            .dialogColor)),
+                            onSelected: (current) {
                               Provider.of<DialogData>(context, listen: false)
-                                  .noteCategory,
-                          menuStyle: MenuStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith((states) =>
-                                      Provider.of<DialogData>(context,
-                                              listen: true)
-                                          .dialogColor)),
-                          onSelected: (current) {
-                            Provider.of<DialogData>(context, listen: false)
-                                .onChanged(current!);
-                          },
-                          dropdownMenuEntries: categories
-                              .map<DropdownMenuEntry<NoteType>>(
-                                  (NoteType category) {
-                            return DropdownMenuEntry<NoteType>(
-                                value: category, label: category.name);
-                          }).toList(),
+                                  .onChanged(current!);
+                            },
+                            dropdownMenuEntries: categories
+                                .map<DropdownMenuEntry<NoteType>>(
+                                    (NoteType category) {
+                              return DropdownMenuEntry<NoteType>(
+                                  value: category,
+                                  label: category.name.capitalize());
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    content: TextField(
+                      controller: controllerDefinition,
+                      cursorHeight: 20,
+                      minLines: 1,
+                      maxLines: 5,
+                      style: p1,
+                      decoration: InputDecoration(
+                        labelText: "Definicija:",
+                        labelStyle: p1.copyWith(color: black),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: black),
                         ),
-                      ],
-                    ),
-                  ),
-                  content: TextField(
-                    controller: controllerDefinition,
-                    cursorHeight: 20,
-                    minLines: 1,
-                    maxLines: 5,
-                    style: p1,
-                    decoration: InputDecoration(
-                      labelText: "Definicija:",
-                      labelStyle: p1.copyWith(color: black),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: black),
-                      ),
-                      enabledBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: accent),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: accent),
+                        ),
                       ),
                     ),
-                  ),
-                  actions: [
-                    ElevatedButton.icon(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith(
-                              (states) => headerColor)),
-                      icon: const Icon(Icons.sticky_note_2, color: white),
-                      onPressed: () {
-                        if (controllerTerm.text.isNotEmpty &&
-                            controllerDefinition.text.isNotEmpty) {
-                          Navigator.of(context).pop([
-                            controllerTerm.text.capitalize(),
-                            controllerDefinition.text.capitalize(),
-                            Provider.of<DialogData>(context, listen: false)
-                                .noteCategory,
-                          ]);
-                        }
-                      },
-                      label: Text(
-                        "Zalijepi",
-                        style: p3.copyWith(color: white),
+                    actions: [
+                      ElevatedButton.icon(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith(
+                                (states) => Provider.of<DialogData>(context,
+                                        listen: true)
+                                    .dialogColor)),
+                        icon: const Icon(Icons.sticky_note_2, color: white),
+                        onPressed: () {
+                          if (controllerTerm.text.isNotEmpty &&
+                              controllerDefinition.text.isNotEmpty) {
+                            Navigator.of(context).pop([
+                              controllerTerm.text.capitalize(),
+                              controllerDefinition.text.capitalize(),
+                              Provider.of<DialogData>(context, listen: false)
+                                  .noteCategory
+                                  .categoryID,
+                            ]);
+                          }
+                        },
+                        label: Text(
+                          "Zalijepi",
+                          style: p3.copyWith(color: white),
+                        ),
                       ),
-                    ),
-                  ]);
-            }),
-          );
+                    ]);
+              }));
         }));
   }
 
@@ -280,9 +319,13 @@ class _NotebookScreenState extends State<NotebookScreen> {
                           }
                           for (int i = 0; i < input.length; i++) {
                             if (input[i] != note.elements[i]) {
-                              Provider.of<NoteData>(superContext, listen: false)
-                                  .editNote(note, i, input[i]);
+                              _databaseHelper.updateNote(Note(
+                                  id: note.id,
+                                  term: input[0],
+                                  definition: input[1],
+                                  categoryID: input[2]));
                             }
+                            _update();
                           }
                         },
                         alignment: Alignment.bottomLeft,
@@ -343,10 +386,9 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                         style: p3.copyWith(color: white),
                                       ),
                                       onPressed: () {
-                                        Provider.of<NoteData>(superContext,
-                                                listen: false)
-                                            .deleteNote(note);
+                                        _databaseHelper.deleteNote(note);
                                         Navigator.of(context).pop();
+                                        _update();
                                       }),
                                 ],
                               );
@@ -367,15 +409,18 @@ class _NotebookScreenState extends State<NotebookScreen> {
                   ),
                 ],
               ),
-              headerBackgroundColor: note.category.headerBackgroundColor,
+              headerBackgroundColor:
+                  categories[note.categoryID].headerBackgroundColor,
               headerBackgroundColorOpened:
-                  note.category.headerBackgroundColorOpened ??
-                      note.category.headerBackgroundColor,
-              headerBorderColor: note.category.headerBorderColor ??
-                  note.category.headerBackgroundColor,
-              headerBorderColorOpened: note.category.headerBorderColorOpened ??
-                  note.category.headerBorderColor,
-              leftIcon: note.category.leftIcon,
+                  categories[note.categoryID].headerBackgroundColorOpened ??
+                      categories[note.categoryID].headerBackgroundColor,
+              headerBorderColor:
+                  categories[note.categoryID].headerBorderColor ??
+                      categories[note.categoryID].headerBackgroundColor,
+              headerBorderColorOpened:
+                  categories[note.categoryID].headerBorderColorOpened ??
+                      categories[note.categoryID].headerBorderColor,
+              leftIcon: categories[note.categoryID].leftIcon,
               contentBackgroundColor: white,
               headerBorderRadius: 5,
             ))
