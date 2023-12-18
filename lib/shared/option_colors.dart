@@ -1,0 +1,1 @@
+// TODO: Create preset colors for options, focus on database now

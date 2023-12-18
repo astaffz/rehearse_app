@@ -1,5 +1,5 @@
 # Project-level configuration.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.50)
 project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
@@ -7,7 +7,7 @@ project(runner LANGUAGES CXX)
 set(BINARY_NAME "rehearse_app")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.example.rehearse_app")
+set(APPLICATION_ID "com.gelegenheit.rehearseapp")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
