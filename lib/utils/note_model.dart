@@ -22,7 +22,7 @@ class NoteType {
   Map<String, dynamic> toMap() {
     return {
       'category_id': categoryID,
-      '': name,
+      'name': name,
     };
   }
 }
@@ -35,7 +35,7 @@ class Note with ChangeNotifier {
     required this.categoryID,
   });
 
-  final int id;
+  int? id;
   String term;
   String definition;
   int categoryID;
@@ -47,12 +47,14 @@ class Note with ChangeNotifier {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'term': term,
       'definition': definition,
       'category_id': categoryID,
     };
   }
+
+  Note.noId(
+      {required this.term, required this.definition, required this.categoryID});
 }
 
 const NoteType defaultType = NoteType(

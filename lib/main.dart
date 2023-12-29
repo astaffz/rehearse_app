@@ -26,6 +26,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  @override
   void dispose() {
     DatabaseHelper databaseHelper = DatabaseHelper();
     super.dispose();
@@ -39,9 +40,9 @@ class _AppState extends State<App> {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return Text('error');
+          return const Text('error');
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Directionality(
+          return const Directionality(
               textDirection: TextDirection.ltr, child: SplashScreen());
         }
         return MaterialApp(

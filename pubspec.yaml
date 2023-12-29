@@ -20,7 +20,8 @@ dependencies:
   cloud_firestore: any
   firebase_auth: any
   font_awesome_flutter: ^10.6.0
-
+  google_sign_in: ^6.1.6
+  multi_dropdown: ^2.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
