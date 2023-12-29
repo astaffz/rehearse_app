@@ -26,29 +26,34 @@ class HomeScreen extends StatelessWidget {
           return const LoginScreen();
         } else {
           return Scaffold(
-            backgroundColor: icon.withAlpha(150),
+            backgroundColor: icon.withAlpha(200),
             body: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
                 // APPBAR - "REHEARSEapp"
-                const RehearseAppBar(),
-                const SizedBox(
-                  height: 10,
-                ),
-                // WELCOME MESSAGE
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: Text(
-                    welcomeMessages[random.nextInt(welcomeMessages.length)],
-                    style: heading3.copyWith(color: white),
-                    textAlign: TextAlign.left,
+                  padding: const EdgeInsets.all(35.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      RehearseAppLogo,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 100.0),
+                        child: Text(
+                          welcomeMessages[
+                              random.nextInt(welcomeMessages.length)],
+                          style: heading3.copyWith(color: white),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
                 // OPTION-BOX
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 15, 18, 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: OptionWidget(options: options),
                 ),
               ],
@@ -56,28 +61,6 @@ class HomeScreen extends StatelessWidget {
           );
         }
       },
-    );
-  }
-}
-
-class RehearseAppBar extends StatelessWidget {
-  const RehearseAppBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      leading: Container(
-        color: white,
-        width: small,
-        height: small,
-        child: Icon(
-          Icons.edit,
-          color: accent,
-          size: medium,
-        ),
-      ),
-      title: Text("RehearseApp", style: heading2),
     );
   }
 }
@@ -94,7 +77,9 @@ class OptionWidget extends StatelessWidget {
       case 0:
         return const NotebookScreen();
       case 1:
+        AuthService().signOut();
         return const NotebookScreen();
+
       case 2:
         return const NotebookScreen();
       default:
@@ -104,38 +89,41 @@ class OptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      color: accentLight,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 15, 0, 266),
-        // COLUMN WITH OPTIONS
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: options.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(options[index]),
-                trailing: Icon(
-                  Icons.arrow_circle_right_outlined,
-                  color: accent,
-                  size: medium,
-                ),
-                titleTextStyle: pBold.copyWith(color: black),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => getDestinationPage(index),
-                      ));
-                },
-              );
-            },
-          )
-        ]),
+    return Hero(
+      tag: 'option.select',
+      child: Material(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        color: accentLight,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 15, 0, 266),
+          // COLUMN WITH OPTIONS
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: options.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(options[index]),
+                  trailing: Icon(
+                    Icons.arrow_circle_right_outlined,
+                    color: accent,
+                    size: medium,
+                  ),
+                  titleTextStyle: pBold.copyWith(color: black),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => getDestinationPage(index),
+                        ));
+                  },
+                );
+              },
+            )
+          ]),
+        ),
       ),
     );
   }
