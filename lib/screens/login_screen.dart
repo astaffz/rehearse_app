@@ -11,28 +11,44 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [background, icon],
-          begin: Alignment.bottomCenter,
-          end: Alignment.topRight,
-        ),
-      ),
-      padding: const EdgeInsets.all(30),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RehearseAppLogo,
-            Flexible(
-                child: LoginButton(
-              icon: FontAwesomeIcons.userNinja,
-              text: "Nastavi bez Ulogovanja",
-              method: AuthService().anonLogin,
-              color: accent,
-            ))
-          ]),
-    ));
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [background, icon],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topRight,
+              ),
+            ),
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                RehearseAppLogo,
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LoginButton(
+                        icon: FontAwesomeIcons.google,
+                        text: "Poveži sa GRačunom",
+                        method: AuthService().LoginWGoogle,
+                        color: Colors.blueAccent,
+                      ),
+                      LoginButton(
+                        icon: FontAwesomeIcons.userTie,
+                        text: "Kreiraj svoj profil",
+                        method: AuthService()
+                            .anonLogin, //TODO: Burageru napravi profile za ovaj brat, more!
+                        color: heading,
+                      ),
+                      LoginButton(
+                        icon: FontAwesomeIcons.magnifyingGlassArrowRight,
+                        text: "Možda kasnije",
+                        method: AuthService().anonLogin,
+                        color: background,
+                      ),
+                    ]),
+              ],
+            )));
   }
 }
 
@@ -58,7 +74,11 @@ class LoginButton extends StatelessWidget {
         style: ButtonStyle(
             backgroundColor:
                 MaterialStateProperty.resolveWith((states) => color)),
-        label: Text(text, style: heading4.copyWith(color: white)),
+        label: Text(
+          text,
+          style: heading4.copyWith(color: white),
+          maxLines: 1,
+        ),
         onPressed: () => method(),
       ),
     );

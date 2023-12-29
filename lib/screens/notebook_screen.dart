@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rehearse_app/main.dart';
+import 'package:rehearse_app/screens/create_test_dialog.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:accordion/accordion.dart';
@@ -45,98 +47,218 @@ class _NotebookScreenState extends State<NotebookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: accentLight,
-      // ADD BUTTON
-      floatingActionButton: IconButton.filled(
-        icon: const Icon(Icons.add, color: icon),
-        onPressed: () async {
-          List dialogInputs = [];
-          dialogInputs = await openDialog() ?? [];
-          if (dialogInputs.isNotEmpty) {
-            _databaseHelper.insertNote(Note(
-                id: await _databaseHelper.notesRecordCount + 1,
-                term: dialogInputs[0],
-                definition: dialogInputs[1],
-                categoryID: dialogInputs[2]));
-            _update();
-          }
-        },
-        style: ButtonStyle(
-            padding: MaterialStateProperty.resolveWith(
-                (states) => const EdgeInsets.all(15)),
-            backgroundColor:
-                MaterialStateProperty.resolveWith((states) => white)),
-      ),
-      body: FutureBuilder(
-          future: notesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(
-                child: SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(
-                      color: accent,
-                    )),
-              );
-            } else if (snapshot.hasError) {
-              // return: show error widget
+    return Hero(
+      tag: 'option.select',
+      child: Scaffold(
+        backgroundColor: accentLight,
+        // ADD BUTTON
+        floatingActionButton: IconButton.filled(
+          icon: const Icon(Icons.add, color: white),
+          onPressed: () async {
+            List dialogInputs = [];
+            dialogInputs = await openDialog() ?? [];
+            if (dialogInputs.isNotEmpty) {
+              _databaseHelper.insertNote(Note.noId(
+                  term: dialogInputs[0],
+                  definition: dialogInputs[1],
+                  categoryID: dialogInputs[2]));
+              _update();
             }
-            notes = snapshot.data ?? [];
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  ListView(
-                    shrinkWrap: true,
-                    children: [
-                      const SizedBox(height: 20),
-                      AppBar(
-                        backgroundColor: Colors.transparent,
-                        leading: IconButton(
-                          padding: const EdgeInsets.only(top: 18, bottom: 18),
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith((states) {
-                              return heading;
-                            }),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0.0),
+          },
+          style: ButtonStyle(
+              padding: MaterialStateProperty.resolveWith(
+                  (states) => const EdgeInsets.all(15)),
+              backgroundColor:
+                  MaterialStateProperty.resolveWith((states) => background)),
+        ),
+        body: FutureBuilder(
+            future: notesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 5),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.all(10.0),
+                      child: IconButton.outlined(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25, vertical: 5),
+                          iconSize: 35,
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            FontAwesomeIcons.backward,
+                            color: black,
+                          )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 5),
+                      child: Text(
+                        softWrap: true,
+                        "Moji \nzapisi",
+                        style: TextStyle(
+                            fontSize: 48,
+                            fontFamily: pBold.fontFamily,
+                            color: black),
+                      ),
+                    ),
+                    const SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(
+                          color: icon,
+                        )),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                // return: show error widget
+              }
+              notes = snapshot.data ?? [];
+              return NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 3.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton.outlined(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25, vertical: 5),
+                                  iconSize: 35,
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  icon: const Icon(
+                                    FontAwesomeIcons.backward,
+                                    color: black,
+                                  )),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => CreateTestDialog(),
+                                  );
+                                },
+                                icon: const Icon(
+                                    FontAwesomeIcons.clipboardQuestion,
+                                    color: white),
+                                style: ButtonStyle(
+                                  shape: MaterialStateProperty.resolveWith(
+                                    (states) => const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  padding: MaterialStateProperty.resolveWith(
+                                      (states) => const EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 10)),
+                                  backgroundColor:
+                                      MaterialStateProperty.resolveWith(
+                                          (states) => icon),
+                                ),
+                                label: Text(
+                                  "Ispitaj me",
+                                  style: pBold.copyWith(fontSize: 15),
+                                ),
                               ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, top: 20, bottom: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  softWrap: true,
+                                  "Moji \nzapisi",
+                                  style: TextStyle(
+                                      fontSize: 48,
+                                      fontFamily: pBold.fontFamily,
+                                      color: black),
+                                ),
+                              ],
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: black,
-                            size: 22.0,
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),
-                        leadingWidth: 32,
-                        title: Text("Zid zapisa",
-                            style: heading2.copyWith(color: black)),
+                          Container(
+                            height: 30,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 15.0),
+                                  child: IconButton.filled(
+                                    iconSize: 15,
+                                    onPressed: null,
+                                    icon: const Icon(Icons.add),
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.resolveWith(
+                                                (states) => Colors.black54),
+                                        foregroundColor:
+                                            MaterialStateProperty.resolveWith(
+                                                (states) => white)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: List.generate(
+                                      categories.length,
+                                      (index) => Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: ElevatedButton.icon(
+                                          icon: Icon(
+                                              categories[index].leftIcon!.icon),
+                                          label: Text(categories[index]
+                                              .name
+                                              .capitalize()),
+                                          onPressed: null,
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith((states) =>
+                                                          Colors.black38),
+                                              foregroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith(
+                                                          (states) => white)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                        child: Accordion(
-                          paddingBetweenClosedSections: 5,
-                          maxOpenSections: 2,
-                          scaleWhenAnimating: false,
-                          children: createSections(notes, context),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
-              ),
-            );
-          }),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Accordion(
+                    paddingBetweenClosedSections: 5,
+                    maxOpenSections: 3,
+                    scaleWhenAnimating: false,
+                    children: createSections(notes, context),
+                  ),
+                ),
+              );
+            }),
+      ),
     );
   }
 

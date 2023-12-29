@@ -34,16 +34,19 @@ class _SplashScreenState extends State<SplashScreen>
           end: Alignment.topRight,
         ),
       ),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        RehearseAppLogo,
-        SizedBox(width: large),
-        const Text(
-          'Powered by Gelegenheit.',
-          style: TextStyle(
-            color: white,
-          ),
-        ),
-      ]),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RehearseAppLogo,
+            SizedBox(width: large),
+            const Text(
+              'Powered by Gelegenheit.',
+              style: TextStyle(
+                color: white,
+              ),
+            ),
+          ]),
     ));
   }
 }
