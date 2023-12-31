@@ -5,7 +5,7 @@ import 'package:rehearse_app/screens/create_test_dialog.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:accordion/accordion.dart';
-import 'package:rehearse_app/utils/note_model.dart';
+import 'package:rehearse_app/models/note_model.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/dialog.dart';

@@ -1,4 +1,4 @@
-import 'package:rehearse_app/utils/note_model.dart';
+import 'package:rehearse_app/models/note_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -126,5 +126,22 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
               .headerBackgroundColor // TODO: Implement colors into DB
           );
     });
+  }
+
+  Future<List<Note>> notesByCategoryQuery(int category) async {
+    Database? db = await database;
+    List<Note> notes = [];
+
+    var notesFromCategory = await db!.rawQuery(
+        'SELECT * FROM ${tableNotes} WHERE ${colCategoryId} = ?', [category]);
+    notes.addAll(List.generate(notesFromCategory.length, (i) {
+      return Note(
+        id: notesFromCategory[i][columnId] as int,
+        term: notesFromCategory[i][colTerm] as String,
+        definition: notesFromCategory[i][colDefinition] as String,
+        categoryID: notesFromCategory[i][colCategoryId] as int,
+      );
+    }));
+    return notes;
   }
 }
