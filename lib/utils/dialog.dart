@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:rehearse_app/utils/note_model.dart';
+import 'package:rehearse_app/models/note_model.dart';
 
 class DialogData with ChangeNotifier {
   NoteType noteCategory = defaultType;

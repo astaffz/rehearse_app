@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:rehearse_app/screens/splash_screen.dart';
 import 'package:rehearse_app/services/app_routes.dart';
 import 'package:rehearse_app/services/database_helper.dart';
-import 'package:rehearse_app/theme.dart';
+import 'package:rehearse_app/utils/theme.dart';
 
 void main() {
   runApp(const App());
