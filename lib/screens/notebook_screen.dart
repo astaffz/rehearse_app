@@ -8,7 +8,7 @@ import 'package:accordion/accordion.dart';
 import 'package:rehearse_app/models/note_model.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/dialog.dart';
+import 'package:rehearse_app/utils/dialog_state.dart';
 
 class NotebookScreen extends StatefulWidget {
   const NotebookScreen({super.key});
@@ -76,7 +76,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 5),
                     Container(
@@ -96,6 +96,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       padding: const EdgeInsets.only(left: 20, top: 5),
                       child: Text(
                         softWrap: true,
+                        textAlign: TextAlign.left,
                         "Moji \nzapisi",
                         style: TextStyle(
                             fontSize: 48,
@@ -114,7 +115,119 @@ class _NotebookScreenState extends State<NotebookScreen> {
               } else if (snapshot.hasError) {
                 // return: show error widget
               }
+
               notes = snapshot.data ?? [];
+              if (notes.isEmpty) {
+                return NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 3.0),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton.outlined(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 25, vertical: 5),
+                                    iconSize: 35,
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    icon: const Icon(
+                                      FontAwesomeIcons.backward,
+                                      color: black,
+                                    )),
+                                ElevatedButton.icon(
+                                  onPressed: () => DialogData().BuildDialog(
+                                      context,
+                                      Text("Trenutno nemoguće", style: pBold),
+                                      Text(
+                                        "Dodaj koji zapis prije nego što se ispitaš!",
+                                        style: p2,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      [
+                                        ElevatedButton(
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith(
+                                            (states) => Colors.red,
+                                          )),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                            "OK",
+                                            style: p2.copyWith(color: white),
+                                          ),
+                                        )
+                                      ]),
+                                  icon: const Icon(
+                                      FontAwesomeIcons.clipboardQuestion,
+                                      color: white),
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.resolveWith(
+                                      (states) => const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    padding: MaterialStateProperty.resolveWith(
+                                        (states) => const EdgeInsets.symmetric(
+                                            horizontal: 15, vertical: 10)),
+                                    backgroundColor:
+                                        MaterialStateProperty.resolveWith(
+                                            (states) => Colors.grey),
+                                  ),
+                                  label: Text(
+                                    "Ispitaj me",
+                                    style: pBold.copyWith(fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, top: 20, bottom: 15),
+                              child: Text(
+                                textAlign: TextAlign.left,
+                                softWrap: true,
+                                "Moji \nzapisi",
+                                style: TextStyle(
+                                    fontSize: 48,
+                                    fontFamily: pBold.fontFamily,
+                                    color: black),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              "Ništa još nije napisano.",
+                              textAlign: TextAlign.center,
+                              style: p2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  body: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Accordion(
+                      paddingBetweenClosedSections: 5,
+                      maxOpenSections: 3,
+                      scaleWhenAnimating: false,
+                      children: createSections(notes, context),
+                    ),
+                  ),
+                );
+              }
               return NestedScrollView(
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   SliverPadding(
@@ -141,7 +254,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
-                                    builder: (context) => CreateTestDialog(),
+                                    builder: (context) =>
+                                        const CreateTestDialog(),
                                   );
                                 },
                                 icon: const Icon(
@@ -462,59 +576,39 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       IconButton(
                         // DELETE BUTTON
                         onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                titlePadding: EdgeInsets.zero,
-                                backgroundColor: white,
-                                title: Container(
-                                  margin: EdgeInsets.zero,
-                                  decoration: const ShapeDecoration(
-                                    color: Colors.red,
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                          width: 12, color: Colors.red),
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(16),
-                                      ),
-                                    ),
+                          DialogData().BuildDialog(
+                            context,
+                            Text("Obrisati?", style: pBold),
+                            Text(
+                              "Da li sigurno želiš obrisati ${note.term}?",
+                              style: p2,
+                            ),
+                            [
+                              TextButton(
+                                  child: Text(
+                                    "Odustani",
+                                    style: p3.copyWith(color: black),
                                   ),
-                                  padding: EdgeInsets.zero,
-                                  child: Text("Obrisati?", style: pBold),
-                                ),
-                                content: Text(
-                                  "Da li sigurno želiš obrisati ${note.term}?",
-                                  style: p2,
-                                ),
-                                actions: [
-                                  TextButton(
-                                      child: Text(
-                                        "Odustani",
-                                        style: p3.copyWith(color: black),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      }),
-                                  ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.resolveWith(
-                                                  (states) => Colors.red)),
-                                      icon: const Icon(Icons.sticky_note_2,
-                                          color: white),
-                                      label: Text(
-                                        "Obriši",
-                                        style: p3.copyWith(color: white),
-                                      ),
-                                      onPressed: () {
-                                        _databaseHelper.deleteNote(note);
-                                        Navigator.of(context).pop();
-                                        _update();
-                                      }),
-                                ],
-                              );
-                            },
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  }),
+                              ElevatedButton.icon(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.resolveWith(
+                                              (states) => Colors.red)),
+                                  icon: const Icon(Icons.sticky_note_2,
+                                      color: white),
+                                  label: Text(
+                                    "Obriši",
+                                    style: p3.copyWith(color: white),
+                                  ),
+                                  onPressed: () {
+                                    _databaseHelper.deleteNote(note);
+                                    Navigator.of(context).pop();
+                                    _update();
+                                  }),
+                            ],
                           );
                         },
 
