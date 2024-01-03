@@ -5,12 +5,13 @@ import 'package:rehearse_app/services/database_helper.dart';
 
 class QuizState with ChangeNotifier {
   double _progress = 0;
-  Quiz quiz = const Quiz(questions: []);
+  Quiz quiz = Quiz(questions: [], noteList: []);
   double get progress => _progress;
   String _selected = '';
   String get selected => _selected;
+  int correctQuestionsIndex = 0;
 
-  final PageController controller = PageController();
+  PageController controller = PageController();
   set progress(double newValue) {
     _progress = newValue;
     notifyListeners();
@@ -32,11 +33,14 @@ class QuizState with ChangeNotifier {
       notes.addAll(notesFromCategory);
     }
     questions = List.generate(
-        notes.length,
-        (index) => Question.createMultipleChoice(
-            questionNote: notes[index], quizNoteList: notes));
-    questions.shuffle();
-    return Quiz(questions: questions);
+      notes.length,
+      (index) {
+        questions.shuffle();
+        return Question.createMultipleChoice(
+            questionNote: notes[index], quizNoteList: notes);
+      },
+    );
+    return Quiz(questions: questions, noteList: notes);
   }
 
   void nextPage() async {

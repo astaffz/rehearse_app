@@ -77,7 +77,6 @@ class OptionWidget extends StatelessWidget {
       case 0:
         return const NotebookScreen();
       case 1:
-        AuthService().signOut();
         return const NotebookScreen();
 
       case 2:

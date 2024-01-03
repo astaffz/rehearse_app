@@ -5,6 +5,7 @@ import 'package:rehearse_app/main.dart';
 import 'package:rehearse_app/screens/quiz_screen.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:rehearse_app/models/note_model.dart';
+import 'package:rehearse_app/utils/dialog_state.dart';
 
 class CreateTestDialog extends StatefulWidget {
   const CreateTestDialog({super.key});
@@ -34,10 +35,8 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
             children: [
               Container(
                 alignment: Alignment.topLeft,
-                child: IconButton.outlined(
-                  icon: Icon(
-                    Icons.keyboard_double_arrow_left,
-                  ),
+                child: IconButton(
+                  icon: const Icon(FontAwesomeIcons.xmark),
                   color: black,
                   onPressed: () {
                     Navigator.pop(context);
@@ -151,20 +150,11 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    selectedCategories = List.generate(
-                        _categorycontroller.selectedOptions.length,
-                        (index) =>
-                            _categorycontroller.selectedOptions[index].value);
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => QuizScreen(
-                                quizCategories: selectedCategories)));
+                    validateOptions(context);
                   },
                   style: ButtonStyle(
                       padding: MaterialStateProperty.resolveWith<EdgeInsets>(
-                          (states) => EdgeInsets.all(15)),
+                          (states) => const EdgeInsets.all(15)),
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                           (states) => Colors.green)),
                   child: Text(
@@ -174,5 +164,43 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
             ],
           )),
     );
+  }
+
+  void validateOptions(BuildContext context) {
+    if (_categorycontroller.selectedOptions.isEmpty) {
+      return DialogData().BuildDialog(
+        context,
+        Text(
+          "Nepotpun zahtjev",
+          style: pBold,
+        ),
+        Text(
+          "Odaberi bar jednu kategoriju!",
+          textAlign: TextAlign.center,
+          style: p2,
+        ),
+        [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (states) => Colors.red)),
+            child: Text(
+              "Probat ću.",
+              style: p1.copyWith(color: white),
+            ),
+          ),
+        ],
+      );
+    }
+    selectedCategories = List.generate(
+        _categorycontroller.selectedOptions.length,
+        (index) => _categorycontroller.selectedOptions[index].value);
+    Navigator.pop(context);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                QuizScreen(quizCategories: selectedCategories)));
   }
 }
