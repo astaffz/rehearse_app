@@ -12,6 +12,7 @@ class QuizState with ChangeNotifier {
   int correctQuestionsIndex = 0;
 
   PageController controller = PageController();
+  TextEditingController writtenTestController = TextEditingController();
   set progress(double newValue) {
     _progress = newValue;
     notifyListeners();
