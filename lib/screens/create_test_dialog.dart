@@ -200,7 +200,8 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                QuizScreen(quizCategories: selectedCategories)));
+            builder: (context) => QuizScreen(
+                quizCategories: selectedCategories,
+                questionType: selectedQuestionType)));
   }
 }
