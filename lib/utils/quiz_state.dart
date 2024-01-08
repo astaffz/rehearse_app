@@ -5,7 +5,7 @@ import 'package:rehearse_app/services/database_helper.dart';
 
 class QuizState with ChangeNotifier {
   double _progress = 0;
-  Quiz quiz = Quiz(questions: [], noteList: []);
+  Quiz quiz = Quiz(noteList: [], questions: []);
   double get progress => _progress;
   String _selected = '';
   String get selected => _selected;
@@ -27,20 +27,17 @@ class QuizState with ChangeNotifier {
     DatabaseHelper databaseHelper = DatabaseHelper();
 
     List<Note> notes = [];
-    List<Question> questions = [];
-    for (int i in selectedCategories) {
-      List<Note> notesFromCategory =
-          await databaseHelper.notesByCategoryQuery(i);
-      notes.addAll(notesFromCategory);
-    }
-    questions = List.generate(
-      notes.length,
-      (index) {
-        questions.shuffle();
-        return Question.createMultipleChoice(
-            questionNote: notes[index], quizNoteList: notes);
-      },
-    );
+    final List<Question> questions;
+
+    List<Note> notesFromCategories =
+        await databaseHelper.notesByCategoryQuery(selectedCategories);
+    notes.addAll(notesFromCategories);
+
+    questions = notes.map((note) {
+      return Question.createMultipleChoice(
+          questionNote: note, quizNoteList: notes);
+    }).toList(growable: false);
+    questions.shuffle();
     return Quiz(questions: questions, noteList: notes);
   }
 

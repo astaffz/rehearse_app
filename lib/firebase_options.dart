@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,38 +49,20 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyApEPSRVEt8uKqZgR5lNK7EaKrz0jVF4Ho',
-    appId: '1:941083888355:web:d062ec3583b51abc8813d6',
-    messagingSenderId: '941083888355',
-    projectId: 'rehearseapp-d9c43',
-    authDomain: 'rehearseapp-d9c43.firebaseapp.com',
-    storageBucket: 'rehearseapp-d9c43.appspot.com',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBZNR4FaRNrVBVMj0FGXPKmvnMga2zc2Mo',
-    appId: '1:941083888355:android:2942b42a6c2d313d8813d6',
-    messagingSenderId: '941083888355',
-    projectId: 'rehearseapp-d9c43',
-    storageBucket: 'rehearseapp-d9c43.appspot.com',
+    apiKey: 'AIzaSyAHn1CN9DIZKmmZxuEia_UNVw9pKU-V02U',
+    appId: '1:241553071863:android:42c953980b05033c597df2',
+    messagingSenderId: '241553071863',
+    projectId: 'rehearse-app',
+    storageBucket: 'rehearse-app.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDpJSIFUSfWuxGPNXn5T7GiNlVko2TRtP8',
-    appId: '1:941083888355:ios:a78d61e782997ef58813d6',
-    messagingSenderId: '941083888355',
-    projectId: 'rehearseapp-d9c43',
-    storageBucket: 'rehearseapp-d9c43.appspot.com',
+    apiKey: 'AIzaSyCHZBmTciCbBhQMts2qGVbVZtUxlzD61qI',
+    appId: '1:241553071863:ios:a366893875903363597df2',
+    messagingSenderId: '241553071863',
+    projectId: 'rehearse-app',
+    storageBucket: 'rehearse-app.appspot.com',
     iosBundleId: 'com.gelegenheit.rehearseApp',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDpJSIFUSfWuxGPNXn5T7GiNlVko2TRtP8',
-    appId: '1:941083888355:ios:646748c7b65c7e928813d6',
-    messagingSenderId: '941083888355',
-    projectId: 'rehearseapp-d9c43',
-    storageBucket: 'rehearseapp-d9c43.appspot.com',
-    iosBundleId: 'com.example.rehearseApp.RunnerTests',
   );
 }

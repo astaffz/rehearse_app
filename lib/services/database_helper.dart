@@ -128,20 +128,23 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
     });
   }
 
-  Future<List<Note>> notesByCategoryQuery(int category) async {
+  Future<List<Note>> notesByCategoryQuery(List<int> categories) async {
     Database? db = await database;
     List<Note> notes = [];
 
-    var notesFromCategory = await db!.rawQuery(
-        'SELECT * FROM ${tableNotes} WHERE ${colCategoryId} = ?', [category]);
-    notes.addAll(List.generate(notesFromCategory.length, (i) {
-      return Note(
-        id: notesFromCategory[i][columnId] as int,
-        term: notesFromCategory[i][colTerm] as String,
-        definition: notesFromCategory[i][colDefinition] as String,
-        categoryID: notesFromCategory[i][colCategoryId] as int,
-      );
-    }));
+    for (int categoryID in categories) {
+      var notesFromCategory = await db!.rawQuery(
+          'SELECT * FROM ${tableNotes} WHERE ${colCategoryId} = ?',
+          [categoryID]);
+      notes.addAll(List.generate(notesFromCategory.length, (i) {
+        return Note(
+          id: notesFromCategory[i][columnId] as int,
+          term: notesFromCategory[i][colTerm] as String,
+          definition: notesFromCategory[i][colDefinition] as String,
+          categoryID: notesFromCategory[i][colCategoryId] as int,
+        );
+      }));
+    }
     return notes;
   }
 }

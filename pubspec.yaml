@@ -1,7 +1,7 @@
 name: rehearse_app
 description: Android application for rehearsing and curating notes.
 publish_to: 'none'
-version: 0.0.3
+version: 0.1.1
 
 environment:
   sdk: '>=3.0.5 <4.0.0'

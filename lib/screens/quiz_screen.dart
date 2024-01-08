@@ -8,12 +8,25 @@ import 'package:rehearse_app/shared/styles.dart';
 import 'package:rehearse_app/utils/dialog_state.dart';
 import 'package:rehearse_app/utils/quiz_state.dart';
 
-class QuizScreen extends StatelessWidget {
+class QuizScreen extends StatefulWidget {
   const QuizScreen(
       {super.key, required this.quizCategories, required this.questionType});
 
   final List<int> quizCategories;
   final QuestionType questionType;
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  late Future<Quiz> quizFuture;
+  @override
+  initState() {
+    super.initState();
+    quizFuture = QuizState().generateMultipleChoiceQuiz(widget.quizCategories);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -21,8 +34,7 @@ class QuizScreen extends StatelessWidget {
       builder: (context, child) {
         var state = Provider.of<QuizState>(context);
         Quiz quiz = Provider.of<QuizState>(context).quiz;
-        Future<Quiz> quizFuture = Provider.of<QuizState>(context)
-            .generateMultipleChoiceQuiz(quizCategories);
+
         return FutureBuilder(
             future: quizFuture,
             builder: (context, snapshot) {
@@ -31,8 +43,8 @@ class QuizScreen extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 );
               } else {
-                state.quiz =
-                    snapshot.data ?? const Quiz(noteList: [], questions: []);
+                quiz = snapshot.data ?? const Quiz(noteList: [], questions: []);
+
                 return Scaffold(
                   appBar: AppBar(
                     title: ProgressBar(value: state.progress),
@@ -56,7 +68,8 @@ class QuizScreen extends StatelessWidget {
                       } else if (idx == quiz.questions.length + 1) {
                         return CongratsPage(quiz: quiz);
                       } else {
-                        if (questionType == QuestionType.multipleChoice) {
+                        if (widget.questionType ==
+                            QuestionType.multipleChoice) {
                           return MultipleChoiceQuestionPage(
                               question: quiz.questions[idx - 1]);
                         } else {
@@ -102,8 +115,7 @@ class QuizScreen extends StatelessWidget {
                   }),
               ElevatedButton.icon(
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith(
-                        (states) => Colors.red)),
+                    backgroundColor: MaterialStateProperty.all(Colors.red)),
                 icon: const Icon(Icons.sticky_note_2, color: white),
                 label: Text(
                   "Izađi",
@@ -261,11 +273,10 @@ void _writtenTestBottomSheet(
                                 color: black,
                               ),
                               style: ButtonStyle(
-                                shape: MaterialStateProperty.resolveWith(
-                                    (states) => const RoundedRectangleBorder()),
+                                shape: MaterialStateProperty.all(
+                                    const RoundedRectangleBorder()),
                                 backgroundColor:
-                                    MaterialStateProperty.resolveWith(
-                                        (states) => accent),
+                                    MaterialStateProperty.all(accent),
                               ),
                               onPressed: () {
                                 Navigator.pop(context);
@@ -290,11 +301,10 @@ void _writtenTestBottomSheet(
                                 color: black,
                               ),
                               style: ButtonStyle(
-                                shape: MaterialStateProperty.resolveWith(
-                                    (states) => const RoundedRectangleBorder()),
+                                shape: MaterialStateProperty.all(
+                                    const RoundedRectangleBorder()),
                                 backgroundColor:
-                                    MaterialStateProperty.resolveWith(
-                                        (states) => accent),
+                                    MaterialStateProperty.all(accent),
                               ),
                               onPressed: () {
                                 state.correctQuestionsIndex++;
@@ -370,10 +380,9 @@ class WrittenAnswerQuestionPage extends StatelessWidget {
                 ),
                 ElevatedButton.icon(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.resolveWith(
-                        (states) => const RoundedRectangleBorder()),
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) => accent),
+                    shape: MaterialStateProperty.all(
+                        const RoundedRectangleBorder()),
+                    backgroundColor: MaterialStateProperty.all(accent),
                   ),
                   onPressed: () {
                     if (controller.text == '') {
@@ -460,10 +469,9 @@ class MultipleChoiceQuestionPage extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 child: ElevatedButton.icon(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.resolveWith(
-                        (states) => const RoundedRectangleBorder()),
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) => accent),
+                    shape: MaterialStateProperty.all(
+                        const RoundedRectangleBorder()),
+                    backgroundColor: MaterialStateProperty.all(accent),
                   ),
                   onPressed: () {
                     state.selected = option;
@@ -524,7 +532,7 @@ class StartPage extends StatelessWidget {
         Text("Sve je spremno!", style: pBold),
         Text(
           textAlign: TextAlign.center,
-          "Broj pitanja: ${state.quiz.questions.length}\nTip pitanja: Višestruki izbor",
+          "Broj pitanja: ${quiz.questions.length}\nTip pitanja: Višestruki izbor",
           style: p2.copyWith(color: white),
         ),
         const SizedBox(

@@ -25,6 +25,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
   late Future<List<NoteType>> categoriesFuture =
       _databaseHelper.getCategoriesDatabase();
   List<Note> notes = [];
+  List<int> categoryFilter = [];
+
   @override
   void initState() {
     super.initState();
@@ -38,15 +40,20 @@ class _NotebookScreenState extends State<NotebookScreen> {
     super.dispose();
   }
 
-  void _update() {
+  void _update([List<int> filter = const []]) {
     setState(() {
-      notesFuture = _databaseHelper.getNotesDatabase();
+      if (filter.isEmpty) {
+        notesFuture = _databaseHelper.getNotesDatabase();
+      } else {
+        notesFuture = _databaseHelper.notesByCategoryQuery(filter);
+      }
       notesFuture.then((notes) => this.notes = notes);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    bool buttonsEnabled = notes.isNotEmpty;
     return Hero(
       tag: 'option.select',
       child: Scaffold(
@@ -66,15 +73,13 @@ class _NotebookScreenState extends State<NotebookScreen> {
             }
           },
           style: ButtonStyle(
-              padding: MaterialStateProperty.resolveWith(
-                  (states) => const EdgeInsets.all(15)),
-              backgroundColor:
-                  MaterialStateProperty.resolveWith((states) => background)),
+              padding: MaterialStateProperty.all(const EdgeInsets.all(15)),
+              backgroundColor: MaterialStateProperty.all(background)),
         ),
         body: FutureBuilder(
             future: notesFuture,
             builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
+              if (!snapshot.hasData) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -117,117 +122,17 @@ class _NotebookScreenState extends State<NotebookScreen> {
               }
 
               notes = snapshot.data ?? [];
+
+              // Plain display when there are saved notes
               if (notes.isEmpty) {
-                return NestedScrollView(
-                  headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 3.0),
-                      sliver: SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton.outlined(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 25, vertical: 5),
-                                    iconSize: 35,
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    icon: const Icon(
-                                      FontAwesomeIcons.backward,
-                                      color: black,
-                                    )),
-                                ElevatedButton.icon(
-                                  onPressed: () => DialogData().BuildDialog(
-                                      context,
-                                      Text("Trenutno nemoguće", style: pBold),
-                                      Text(
-                                        "Dodaj koji zapis prije nego što se ispitaš!",
-                                        style: p2,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      [
-                                        ElevatedButton(
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith(
-                                            (states) => Colors.red,
-                                          )),
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text(
-                                            "OK",
-                                            style: p2.copyWith(color: white),
-                                          ),
-                                        )
-                                      ]),
-                                  icon: const Icon(
-                                      FontAwesomeIcons.clipboardQuestion,
-                                      color: white),
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.resolveWith(
-                                      (states) => const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    padding: MaterialStateProperty.resolveWith(
-                                        (states) => const EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 10)),
-                                    backgroundColor:
-                                        MaterialStateProperty.resolveWith(
-                                            (states) => Colors.grey),
-                                  ),
-                                  label: Text(
-                                    "Ispitaj me",
-                                    style: pBold.copyWith(fontSize: 15),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 20, bottom: 15),
-                              child: Text(
-                                textAlign: TextAlign.left,
-                                softWrap: true,
-                                "Moji \nzapisi",
-                                style: TextStyle(
-                                    fontSize: 48,
-                                    fontFamily: pBold.fontFamily,
-                                    color: black),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              "Ništa još nije napisano.",
-                              textAlign: TextAlign.center,
-                              style: p2,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                  body: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Accordion(
-                      paddingBetweenClosedSections: 5,
-                      maxOpenSections: 3,
-                      scaleWhenAnimating: false,
-                      children: createSections(notes, context),
-                    ),
-                  ),
-                );
+                buttonsEnabled = false;
+              } else {
+                buttonsEnabled = true;
               }
+
+              // What displays after a note is added,
+              // Category row implemented
+
               return NestedScrollView(
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   SliverPadding(
@@ -252,30 +157,58 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                   )),
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) =>
-                                        const CreateTestDialog(),
-                                  );
+                                  buttonsEnabled || categoryFilter.isNotEmpty
+                                      ? showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              const CreateTestDialog(),
+                                        )
+                                      : DialogData().BuildDialog(
+                                          context,
+                                          Text("Trenutno nemoguće",
+                                              style: pBold),
+                                          Text(
+                                            "Dodaj koji zapis prije nego što se ispitaš!",
+                                            style: p2,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          [
+                                              ElevatedButton(
+                                                style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                  Colors.red,
+                                                )),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text(
+                                                  "OK",
+                                                  style:
+                                                      p2.copyWith(color: white),
+                                                ),
+                                              )
+                                            ]);
                                 },
                                 icon: const Icon(
                                     FontAwesomeIcons.clipboardQuestion,
                                     color: white),
                                 style: ButtonStyle(
-                                  shape: MaterialStateProperty.resolveWith(
-                                    (states) => const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
+                                    shape: MaterialStateProperty.all(
+                                      const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  padding: MaterialStateProperty.resolveWith(
-                                      (states) => const EdgeInsets.symmetric(
-                                          horizontal: 15, vertical: 10)),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith(
-                                          (states) => icon),
-                                ),
+                                    padding: MaterialStateProperty.all(
+                                        const EdgeInsets.symmetric(
+                                            horizontal: 15, vertical: 10)),
+                                    backgroundColor: buttonsEnabled ||
+                                            categoryFilter.isNotEmpty
+                                        ? MaterialStateProperty.all(icon)
+                                        : MaterialStateProperty.all(
+                                            Colors.black26)),
                                 label: Text(
                                   "Ispitaj me",
                                   style: pBold.copyWith(fontSize: 15),
@@ -307,7 +240,6 @@ class _NotebookScreenState extends State<NotebookScreen> {
                             height: 30,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 15.0),
@@ -317,11 +249,10 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                     icon: const Icon(Icons.add),
                                     style: ButtonStyle(
                                         backgroundColor:
-                                            MaterialStateProperty.resolveWith(
-                                                (states) => Colors.black54),
+                                            MaterialStateProperty.all(
+                                                Colors.black54),
                                         foregroundColor:
-                                            MaterialStateProperty.resolveWith(
-                                                (states) => white)),
+                                            MaterialStateProperty.all(white)),
                                   ),
                                 ),
                                 Expanded(
@@ -329,27 +260,58 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                     scrollDirection: Axis.horizontal,
                                     children: List.generate(
                                       categories.length,
-                                      (index) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 5.0),
-                                        child: ElevatedButton.icon(
-                                          icon: Icon(
-                                              categories[index].leftIcon!.icon),
-                                          label: Text(categories[index]
-                                              .name
-                                              .capitalize()),
-                                          onPressed: null,
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith((states) =>
-                                                          Colors.black38),
-                                              foregroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith(
-                                                          (states) => white)),
-                                        ),
-                                      ),
+                                      (index) {
+                                        NoteType buttonCategory =
+                                            categories[index];
+                                        return Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5.0),
+                                            child: ElevatedButton.icon(
+                                              icon: Icon(
+                                                buttonCategory.leftIcon!.icon,
+                                                color: white,
+                                              ),
+                                              label: Text(
+                                                categories[index]
+                                                    .name
+                                                    .capitalize(),
+                                                style:
+                                                    p3.copyWith(color: white),
+                                              ),
+                                              onPressed: () {
+                                                buttonsEnabled ||
+                                                        categoryFilter
+                                                            .isNotEmpty
+                                                    ? setState(() {
+                                                        if (!categoryFilter
+                                                            .contains(
+                                                                buttonCategory
+                                                                    .categoryID)) {
+                                                          categoryFilter.add(
+                                                              buttonCategory
+                                                                  .categoryID);
+                                                        } else {
+                                                          categoryFilter.remove(
+                                                              buttonCategory
+                                                                  .categoryID);
+                                                        }
+                                                        categoryFilter
+                                                                .isNotEmpty
+                                                            ? _update(
+                                                                categoryFilter)
+                                                            : _update();
+                                                      })
+                                                    : null;
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      categoryFilter.contains(
+                                                              buttonCategory
+                                                                  .categoryID)
+                                                          ? accent
+                                                          : Colors.black38),
+                                            ));
+                                      },
                                     ),
                                   ),
                                 ),
@@ -453,12 +415,10 @@ class _NotebookScreenState extends State<NotebookScreen> {
                                 Provider.of<DialogData>(context, listen: true)
                                     .noteCategory,
                             menuStyle: MenuStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith(
-                                        (states) => Provider.of<DialogData>(
-                                                context,
-                                                listen: true)
-                                            .dialogColor)),
+                                backgroundColor: MaterialStateProperty.all(
+                                    Provider.of<DialogData>(context,
+                                            listen: true)
+                                        .dialogColor)),
                             onSelected: (current) {
                               Provider.of<DialogData>(context, listen: false)
                                   .onChanged(current!);
@@ -494,9 +454,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
                     actions: [
                       ElevatedButton.icon(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => Provider.of<DialogData>(context,
-                                        listen: true)
+                            backgroundColor: MaterialStateProperty.all(
+                                Provider.of<DialogData>(context, listen: true)
                                     .dialogColor)),
                         icon: const Icon(Icons.sticky_note_2, color: white),
                         onPressed: () {
@@ -566,8 +525,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                         },
                         alignment: Alignment.bottomLeft,
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => white)),
+                            backgroundColor: MaterialStateProperty.all(white)),
                         icon: const Icon(
                           Icons.edit,
                           color: black,
@@ -595,8 +553,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               ElevatedButton.icon(
                                   style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.resolveWith(
-                                              (states) => Colors.red)),
+                                          MaterialStateProperty.all(
+                                              Colors.red)),
                                   icon: const Icon(Icons.sticky_note_2,
                                       color: white),
                                   label: Text(
@@ -614,8 +572,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
 
                         alignment: Alignment.bottomLeft,
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => white)),
+                            backgroundColor: MaterialStateProperty.all(white)),
                         icon: const Icon(
                           Icons.delete,
                           color: black,
@@ -625,6 +582,10 @@ class _NotebookScreenState extends State<NotebookScreen> {
                   ),
                 ],
               ),
+
+              // Just some regular properties of the note display
+              // They look frightening but really I've just set a default value for all of them which is the color of the category, which is required
+
               headerBackgroundColor:
                   categories[note.categoryID].headerBackgroundColor,
               headerBackgroundColorOpened:

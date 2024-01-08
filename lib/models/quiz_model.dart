@@ -34,18 +34,16 @@ class Question {
       List<String> definitions = List.generate(
           quizNoteList.length, (index) => quizNoteList[index].definition);
       options = definitions;
-      options.shuffle();
     } else {
       var random = Random();
       while (options.length < 4) {
-        options.shuffle();
         int randomOption = random.nextInt(quizNoteList.length);
         if (!options.contains(quizNoteList[randomOption].definition)) {
           options.add(quizNoteList[randomOption].definition);
         }
       }
     }
-
+    options.shuffle();
     return Question.multpleChoice(
         question: questionNote.term, options: options, note: questionNote);
   }

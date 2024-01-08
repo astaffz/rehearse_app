@@ -71,9 +71,7 @@ class LoginButton extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       child: ElevatedButton.icon(
         icon: Icon(icon, color: white, size: 20),
-        style: ButtonStyle(
-            backgroundColor:
-                MaterialStateProperty.resolveWith((states) => color)),
+        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(color)),
         label: Text(
           text,
           style: heading4.copyWith(color: white),

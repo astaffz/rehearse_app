@@ -9,6 +9,7 @@ import 'package:rehearse_app/shared/shared.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     List<String> welcomeMessages = [

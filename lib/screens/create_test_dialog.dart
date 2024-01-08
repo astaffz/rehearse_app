@@ -77,8 +77,8 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                 ],
                 selected: <QuestionType>{selectedQuestionType},
                 style: ButtonStyle(
-                  fixedSize: MaterialStateProperty.resolveWith<Size>(
-                      (states) => const Size.fromHeight(10.0)),
+                  fixedSize: MaterialStateProperty.all<Size>(
+                      const Size.fromHeight(10.0)),
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
                     (Set<MaterialState> states) {
                       if (states.contains(MaterialState.selected)) {
@@ -153,10 +153,10 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                     validateOptions(context);
                   },
                   style: ButtonStyle(
-                      padding: MaterialStateProperty.resolveWith<EdgeInsets>(
-                          (states) => const EdgeInsets.all(15)),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (states) => Colors.green)),
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                          const EdgeInsets.all(15)),
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.green)),
                   child: Text(
                     "GENERIŠI TEST",
                     style: pBold,
@@ -183,8 +183,7 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (states) => Colors.red)),
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.red)),
             child: Text(
               "Probat ću.",
               style: p1.copyWith(color: white),
