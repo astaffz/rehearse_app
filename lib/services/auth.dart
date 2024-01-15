@@ -17,7 +17,7 @@ class AuthService {
     await FirebaseAuth.instance.signOut();
   }
 
-  Future<void> LoginWGoogle() async {
+  Future<void> loginWGoogle() async {
     try {
       final user = await GoogleSignIn().signIn();
 

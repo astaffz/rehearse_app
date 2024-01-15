@@ -4,11 +4,15 @@ import 'package:rehearse_app/screens/splash_screen.dart';
 import 'package:rehearse_app/services/app_routes.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/utils/theme.dart';
+import 'package:rehearse_app/shared/shared.dart';
+
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
-  runApp(const App());
+  tz.initializeTimeZones();
 
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const App());
 }
 
 extension StringExtension on String {
@@ -31,6 +35,15 @@ class _AppState extends State<App> {
     DatabaseHelper databaseHelper = DatabaseHelper();
     super.dispose();
     databaseHelper.closeDb();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    RehearseAppNotificationManager.init();
+    RehearseAppNotificationManager.recievedResponses.stream.listen((event) {
+      Navigator.of(context).pushNamed('/notifications');
+    });
   }
 
   @override

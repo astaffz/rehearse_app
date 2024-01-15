@@ -30,7 +30,7 @@ class LoginScreen extends StatelessWidget {
                       LoginButton(
                         icon: FontAwesomeIcons.google,
                         text: "Poveži sa GRačunom",
-                        method: AuthService().LoginWGoogle,
+                        method: AuthService().loginWGoogle,
                         color: Colors.blueAccent,
                       ),
                       LoginButton(

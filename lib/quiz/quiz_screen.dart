@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:rehearse_app/models/quiz_model.dart';
-import 'package:rehearse_app/screens/create_test_dialog.dart';
+import 'package:rehearse_app/notes/create_test_dialog.dart';
 import 'package:rehearse_app/shared/progress_bar.dart';
 import 'package:rehearse_app/shared/styles.dart';
-import 'package:rehearse_app/utils/dialog_state.dart';
-import 'package:rehearse_app/utils/quiz_state.dart';
+import 'package:rehearse_app/notes/dialog_state.dart';
+import 'package:rehearse_app/quiz/quiz_state.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen(

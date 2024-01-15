@@ -2,7 +2,8 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rehearse_app/screens/login_screen.dart';
-import 'package:rehearse_app/screens/notebook_screen.dart';
+import 'package:rehearse_app/notes/notebook_screen.dart';
+import 'package:rehearse_app/reminders/notifications_screen.dart';
 import 'package:rehearse_app/screens/splash_screen.dart';
 import 'package:rehearse_app/services/auth.dart';
 import 'package:rehearse_app/shared/shared.dart';
@@ -78,7 +79,7 @@ class OptionWidget extends StatelessWidget {
       case 0:
         return const NotebookScreen();
       case 1:
-        return const NotebookScreen();
+        return const NotificationsScreen();
 
       case 2:
         return const NotebookScreen();

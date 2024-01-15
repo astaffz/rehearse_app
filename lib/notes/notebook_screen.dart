@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rehearse_app/main.dart';
-import 'package:rehearse_app/screens/create_test_dialog.dart';
+import 'package:rehearse_app/notes/create_test_dialog.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:accordion/accordion.dart';
 import 'package:rehearse_app/models/note_model.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rehearse_app/utils/dialog_state.dart';
+import 'package:rehearse_app/notes/dialog_state.dart';
 
 class NotebookScreen extends StatefulWidget {
   const NotebookScreen({super.key});
@@ -89,11 +89,11 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       padding: const EdgeInsets.all(10.0),
                       child: IconButton.outlined(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 25, vertical: 5),
+                              horizontal: 10, vertical: 5),
                           iconSize: 35,
                           onPressed: () => Navigator.of(context).pop(),
                           icon: const Icon(
-                            FontAwesomeIcons.backward,
+                            FontAwesomeIcons.xmark,
                             color: black,
                           )),
                     ),
@@ -148,11 +148,11 @@ class _NotebookScreenState extends State<NotebookScreen> {
                             children: [
                               IconButton.outlined(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 25, vertical: 5),
+                                      horizontal: 10, vertical: 5),
                                   iconSize: 35,
                                   onPressed: () => Navigator.of(context).pop(),
                                   icon: const Icon(
-                                    FontAwesomeIcons.backward,
+                                    FontAwesomeIcons.xmark,
                                     color: black,
                                   )),
                               ElevatedButton.icon(
@@ -233,8 +233,12 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10, left: 20),
+                            child: Text(
+                              "kategorije:",
+                              style: dialogText.copyWith(fontSize: p1.fontSize),
+                            ),
                           ),
                           Container(
                             height: 30,
@@ -387,7 +391,6 @@ class _NotebookScreenState extends State<NotebookScreen> {
                             child: TextField(
                               controller: controllerTerm,
                               style: pBold,
-                              maxLines: 1,
                               decoration: InputDecoration(
                                 labelText: "Pojam:",
                                 labelStyle: p1.copyWith(color: white),

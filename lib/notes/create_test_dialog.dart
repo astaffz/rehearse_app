@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:rehearse_app/main.dart';
-import 'package:rehearse_app/screens/quiz_screen.dart';
+import 'package:rehearse_app/quiz/quiz_screen.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:rehearse_app/models/note_model.dart';
-import 'package:rehearse_app/utils/dialog_state.dart';
+import 'package:rehearse_app/notes/dialog_state.dart';
 
 class CreateTestDialog extends StatefulWidget {
   const CreateTestDialog({super.key});
