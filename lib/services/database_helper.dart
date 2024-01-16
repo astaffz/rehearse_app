@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:rehearse_app/models/note_model.dart';
+import 'package:rehearse_app/models/reminder_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -6,8 +8,9 @@ class DatabaseHelper {
   final String databaseName = 'rehearseapp_data.db';
   final int databaseVersion = 1;
 
-  final String tableNotes = "notes";
   final String columnId = 'id';
+
+  final String tableNotes = "notes";
   final String colTerm = 'term';
   final String colDefinition = 'definition';
   final String colCategoryId = 'category_id';
@@ -15,11 +18,21 @@ class DatabaseHelper {
   final String tableCategories = 'categories';
   final String colTitle = 'title';
 
+  final String tableReminders = "reminders";
+  final String colContent = "content";
+  final String colDateTime = "scheduled_at";
   static Database? _database;
 
   Future<Database?> get database async {
-    _database ??= await _initDatabase();
+    _database ??= await initDatabase();
     return _database;
+  }
+
+  Future<int> getLastID(String tableName) async {
+    int? id = Sqflite.firstIntValue(await _database!
+            .rawQuery("SELECT max($columnId) FROM $tableName")) ??
+        0;
+    return id;
   }
 
   Future<int> get notesRecordCount async {
@@ -29,24 +42,39 @@ class DatabaseHelper {
     return count;
   }
 
-  Future<Database?> _initDatabase() async {
+  Future<int> get remindersRecordCount async {
+    int? count = Sqflite.firstIntValue(await _database!
+            .rawQuery('SELECT COUNT(*) FROM $tableReminders')) ??
+        0;
+    return count;
+  }
+
+  Future<Database?> initDatabase() async {
     String path = join(await getDatabasesPath(), databaseName);
 
-    return openDatabase(path,
-        onCreate: _onCreate,
-        onOpen: _onOpen,
-        onConfigure: _onConfigure,
-        version: databaseVersion);
+    return openDatabase(path, onCreate: (Database db, int newVersion) async {
+      for (int version = 0; version < newVersion; version++) {
+        await _performDBUpgrade(db, version + 1);
+      }
+    }, onUpgrade: (Database db, int oldVersion, int newVersion) async {
+      for (int version = oldVersion; version < newVersion; version++) {
+        await _performDBUpgrade(db, version + 1);
+      }
+    }, onConfigure: _onConfigure, version: databaseVersion);
   }
 
-  void _onOpen(Database db) async {
-    db.insert(tableCategories, {columnId: 0, colTitle: "defaultType"},
-        conflictAlgorithm: ConflictAlgorithm.ignore);
-    db.insert(tableCategories, {columnId: 1, colTitle: "important"},
-        conflictAlgorithm: ConflictAlgorithm.ignore);
+  Future _performDBUpgrade(Database db, int upgradeToVersion) async {
+    switch (upgradeToVersion) {
+      //Upgrade to V1 (initial creation)
+      case 1:
+        await _dbUpdatesVersion_1(db);
+        break;
+
+      //Upgrades for V2
+    }
   }
 
-  void _onCreate(Database db, int version) {
+  Future<void> _dbUpdatesVersion_1(Database db) async {
     db.execute("""
     CREATE TABLE notes (
     $columnId     INTEGER PRIMARY KEY ASC AUTOINCREMENT
@@ -63,12 +91,25 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
     $colTitle       TEXT    NOT NULL DEFAULT defaultType
 )
 """);
+    db.execute("""
+    CREATE TABLE $tableReminders (
+    $columnId     INTEGER PRIMARY KEY ASC AUTOINCREMENT
+                        NOT NULL,
+    $colContent        TEXT    NOT NULL,
+    $colDateTime  TEXT    NOT NULL)
+                        """);
+
+    db.insert(tableCategories, {columnId: 0, colTitle: "defaultType"},
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    db.insert(tableCategories, {columnId: 1, colTitle: "important"},
+        conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
   static Future<void> _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
+// CRUD - NOTES
   Future<int> insertNote(Note note) async {
     Database? db = await database;
     return await db!.insert(tableNotes, note.toMap());
@@ -88,9 +129,44 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
         .delete(tableNotes, where: '$columnId = ?', whereArgs: [note.id]);
   }
 
+// CRUD - CATEGORIES
   Future<int> insertCategory(NoteType category) async {
     Database? db = await database;
     return await db!.insert(tableCategories, category.toMap());
+  }
+
+  Future<int> updateCategory(NoteType category) async {
+    Database? db = await database;
+    return await db!.update(tableCategories, category.toMap(),
+        where: '$columnId = ?',
+        whereArgs: [category.categoryID],
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<int> deleteCategory(NoteType category) async {
+    Database? db = await database;
+    return await db!.delete(tableCategories,
+        where: '$columnId = ?', whereArgs: [category.categoryID]);
+  }
+
+// CRUD - Reminders
+  Future<int> insertReminder(Reminder reminder) async {
+    Database? db = await database;
+    return await db!.insert(tableReminders, reminder.toMap());
+  }
+
+  Future<int> updateReminder(Reminder reminder) async {
+    Database? db = await database;
+    return await db!.update(tableCategories, reminder.toMap(),
+        where: '$columnId = ?',
+        whereArgs: [reminder.id],
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<int> deleteReminder(Reminder reminder) async {
+    Database? db = await database;
+    return await db!.delete(tableCategories,
+        where: '$columnId = ?', whereArgs: [reminder.id]);
   }
 
   Future<void> closeDb() async {
@@ -125,6 +201,20 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
           headerBackgroundColor: defaultType
               .headerBackgroundColor // TODO: Implement colors into DB
           );
+    });
+  }
+
+  Future<List<Reminder>> getRemindersDatabase() async {
+    Database? db = await database;
+    final List<Map<String, dynamic>> mappedReminders =
+        await db!.rawQuery("SELECT * FROM $tableReminders");
+
+    return List.generate(mappedReminders.length, (i) {
+      return Reminder(
+        id: mappedReminders[i][columnId],
+        reminderContent: mappedReminders[i][colContent],
+        Iso8601scheduledTime: mappedReminders[i][colDateTime],
+      );
     });
   }
 

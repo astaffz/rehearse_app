@@ -4,7 +4,7 @@ class NotificationsState with ChangeNotifier {
   TextEditingController controller = TextEditingController();
   DateTime? _dateSelected;
   TimeOfDay? _timeSelected;
-
+  int pageIndex = 0;
   set date(DateTime newDate) {
     _dateSelected = newDate;
     notifyListeners();
@@ -24,8 +24,7 @@ class NotificationsState with ChangeNotifier {
   }
 
   String dateToString() {
-    _dateSelected ??= DateTime.now();
-    return "${_dateSelected!.day}. ${_dateSelected!.month}. ${_dateSelected!.year}. g";
+    return "${getAccurateDate().day}. ${getAccurateDate().month}. ${getAccurateDate().year}. g";
   }
 
   String timeToString() {
@@ -36,8 +35,8 @@ class NotificationsState with ChangeNotifier {
       return value.toString();
     }
 
-    final String hourLabel = addLeadingZeroIfNeeded(_timeSelected!.hour);
-    final String minuteLabel = addLeadingZeroIfNeeded(_timeSelected!.minute);
+    final String hourLabel = addLeadingZeroIfNeeded(getAccurateTime().hour);
+    final String minuteLabel = addLeadingZeroIfNeeded(getAccurateTime().minute);
 
     return '$hourLabel:$minuteLabel';
   }
