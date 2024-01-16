@@ -28,7 +28,7 @@ class RehearseAppNotificationManager {
     );
     final initConfig = InitializationSettings(android: android, iOS: iOS);
     await _notificationsPlugin.initialize(initConfig,
-        onDidReceiveBackgroundNotificationResponse: (details) async {
+        onDidReceiveNotificationResponse: (details) async {
       recievedResponses.add(details.payload);
     });
   }

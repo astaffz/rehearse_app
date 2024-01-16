@@ -9,9 +9,11 @@ import 'package:rehearse_app/shared/shared.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
+  DatabaseHelper databaseHelper = DatabaseHelper();
   tz.initializeTimeZones();
 
   WidgetsFlutterBinding.ensureInitialized();
+  databaseHelper.database;
   runApp(const App());
 }
 

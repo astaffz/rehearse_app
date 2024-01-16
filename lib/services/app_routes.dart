@@ -9,5 +9,5 @@ var appRoutes = {
   '/tips': (context) => const TipsScreen(),
   '/login': (context) => const LoginScreen(),
   '/notes': (context) => const NotebookScreen(),
-  '/notifications': (context) => const NotificationsScreen(),
+  '/notifications': (context) => NotificationsScreen(),
 };

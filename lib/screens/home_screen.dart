@@ -79,7 +79,7 @@ class OptionWidget extends StatelessWidget {
       case 0:
         return const NotebookScreen();
       case 1:
-        return const NotificationsScreen();
+        return NotificationsScreen();
 
       case 2:
         return const NotebookScreen();
