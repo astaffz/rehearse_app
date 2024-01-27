@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rehearse_app/reader/reader_screen.dart';
 import 'package:rehearse_app/screens/login_screen.dart';
 import 'package:rehearse_app/notes/notebook_screen.dart';
 import 'package:rehearse_app/reminders/notifications_screen.dart';
@@ -14,10 +15,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> welcomeMessages = [
-      "Ćao doktore, nastavljaš rasturat'?"
+      "Ćao doktore, nastavljaš rasturat'?",
+      "Pozdrav vizionaru, kako oblikuješ budućnost danas?",
+      "Gdje si pobjedniče, osvajaš li svoje bitke danas?",
+      "Gdje si inspiracijo, kako širiš svoju svjetlost danas?",
+      "O magijo, kakvo čudo danas nas očekuje?",
+      "Poštovanje kapetane, kuda plovimo danas?",
+      "Gdje si lavino, kakve prepreke danas rušimo?",
+      "Poštovanje velikane, i danas dominiramo?",
+      "Izvoli šefe, šta treba?",
+      "Ćao lave, samo nastavi!",
+      "O šampionu, i danas punom parom?",
+      "Gdje si zvijezdo, koliko nam danas sijajiš?",
     ]; // TODO: Add more messages
     List<String> options = ["Moji zapisi", "Moji podsjetnici", "Moj reader"];
-    final random = new Random();
+    final random = Random();
 
     return StreamBuilder(
       stream: AuthService().userStream,
@@ -46,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                           welcomeMessages[
                               random.nextInt(welcomeMessages.length)],
                           style: heading3.copyWith(color: white),
-                          textAlign: TextAlign.left,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
@@ -79,10 +91,10 @@ class OptionWidget extends StatelessWidget {
       case 0:
         return const NotebookScreen();
       case 1:
-        return NotificationsScreen();
+        return const NotificationsScreen();
 
       case 2:
-        return const NotebookScreen();
+        return const ReaderScreen();
       default:
         throw Exception("No page selected.");
     }

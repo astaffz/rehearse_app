@@ -12,7 +12,12 @@
           "package_name": "com.gelegenheit.rehearseapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "241553071863-kops8o5tv1ei526b9p1204cv65jhnjuq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAHn1CN9DIZKmmZxuEia_UNVw9pKU-V02U"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "241553071863-kops8o5tv1ei526b9p1204cv65jhnjuq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "241553071863-l84dfgq5k716lt2vpej30931j5ihnf4q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gelegenheit.rehearseApp.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }

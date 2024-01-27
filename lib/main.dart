@@ -8,10 +8,9 @@ import 'package:rehearse_app/shared/shared.dart';
 
 import 'package:timezone/data/latest.dart' as tz;
 
-void main() {
+void main() async {
   DatabaseHelper databaseHelper = DatabaseHelper();
   tz.initializeTimeZones();
-
   WidgetsFlutterBinding.ensureInitialized();
   databaseHelper.database;
   runApp(const App());
@@ -32,9 +31,9 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  DatabaseHelper databaseHelper = DatabaseHelper();
   @override
   void dispose() {
-    DatabaseHelper databaseHelper = DatabaseHelper();
     super.dispose();
     databaseHelper.closeDb();
   }
@@ -42,9 +41,14 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    RehearseAppNotificationManager.init();
-    RehearseAppNotificationManager.recievedResponses.stream.listen((event) {
-      Navigator.of(context).pushNamed('/notifications');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        RehearseAppNotificationManager.init();
+        RehearseAppNotificationManager.recievedResponses.stream.listen((event) {
+          Navigator.of(context).pushNamed('/notifications');
+        });
+      }
     });
   }
 

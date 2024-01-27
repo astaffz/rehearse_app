@@ -1,7 +1,7 @@
 name: rehearse_app
 description: Android application for rehearsing and curating notes.
 publish_to: 'none'
-version: 0.3.0
+version: 0.3.3
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -13,7 +13,6 @@ dependencies:
   accordion: ^2.6.0
   provider: ^6.1.1
   sqflite: ^2.3.0
-  sqflite_common_ffi: any
   path: ^1.8.3
   firebase_core: ^2.24.2
   cloud_firestore: any
@@ -25,6 +24,10 @@ dependencies:
   flutter_local_notifications: ^16.3.0
   rxdart: ^0.27.7
   timezone: ^0.9.2
+  google_mlkit_text_recognition: ^0.11.0
+  camera: ^0.10.5+9
+  image_picker: ^1.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

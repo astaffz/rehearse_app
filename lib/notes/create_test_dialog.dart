@@ -95,7 +95,7 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
               ),
               Row(
                 children: [
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: MultiSelectDropDown(
                       hint: "Odaberi: ",
@@ -115,6 +115,18 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                         selectedOptions.map((element) {
                           selectedCategories.add(element.value);
                         });
+
+                        // The value that the 'Svi zapisi' checkbox depends on
+                        // It should align with the selection
+                        if (selectedOptions.length != categories.length) {
+                          setState(() {
+                            allCategoriesSelected = false;
+                          });
+                        } else {
+                          setState(() {
+                            allCategoriesSelected = true;
+                          });
+                        }
                       },
                       optionTextStyle: p2,
                       options: List.generate(
@@ -168,7 +180,7 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
 
   void validateOptions(BuildContext context) {
     if (_categorycontroller.selectedOptions.isEmpty) {
-      return DialogData().BuildDialog(
+      return DialogData.BuildDialog(
         context,
         Text(
           "Nepotpun zahtjev",

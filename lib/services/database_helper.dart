@@ -29,8 +29,8 @@ class DatabaseHelper {
   }
 
   Future<int> getLastID(String tableName) async {
-    int? id = Sqflite.firstIntValue(await _database!
-            .rawQuery("SELECT max($columnId) FROM $tableName")) ??
+    int? id = Sqflite.firstIntValue(await _database!.rawQuery(
+            "SELECT seq FROM sqlite_sequence WHERE name=?", [tableName])) ??
         0;
     return id;
   }
@@ -69,8 +69,6 @@ class DatabaseHelper {
       case 1:
         await _dbUpdatesVersion_1(db);
         break;
-
-      //Upgrades for V2
     }
   }
 
@@ -103,6 +101,12 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
         conflictAlgorithm: ConflictAlgorithm.ignore);
     db.insert(tableCategories, {columnId: 1, colTitle: "important"},
         conflictAlgorithm: ConflictAlgorithm.ignore);
+    db.insert(tableNotes, {
+      columnId: 0,
+      colTerm: "notes",
+      colDefinition: "test",
+      colCategoryId: 0
+    });
   }
 
   static Future<void> _onConfigure(Database db) async {
@@ -157,7 +161,7 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
 
   Future<int> updateReminder(Reminder reminder) async {
     Database? db = await database;
-    return await db!.update(tableCategories, reminder.toMap(),
+    return await db!.update(tableReminders, reminder.toMap(),
         where: '$columnId = ?',
         whereArgs: [reminder.id],
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -165,7 +169,7 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
 
   Future<int> deleteReminder(Reminder reminder) async {
     Database? db = await database;
-    return await db!.delete(tableCategories,
+    return await db!.delete(tableReminders,
         where: '$columnId = ?', whereArgs: [reminder.id]);
   }
 
@@ -224,8 +228,7 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
 
     for (int categoryID in categories) {
       var notesFromCategory = await db!.rawQuery(
-          'SELECT * FROM ${tableNotes} WHERE ${colCategoryId} = ?',
-          [categoryID]);
+          'SELECT * FROM $tableNotes WHERE $colCategoryId = ?', [categoryID]);
       notes.addAll(List.generate(notesFromCategory.length, (i) {
         return Note(
           id: notesFromCategory[i][columnId] as int,

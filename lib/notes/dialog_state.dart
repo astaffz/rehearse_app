@@ -22,7 +22,7 @@ class DialogData with ChangeNotifier {
     notifyListeners();
   }
 
-  void BuildDialog(BuildContext context, Widget title, Widget content,
+  static void BuildDialog(BuildContext context, Widget title, Widget content,
       List<Widget> actions) {
     showDialog(
       context: context,

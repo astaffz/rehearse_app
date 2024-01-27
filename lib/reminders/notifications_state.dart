@@ -27,7 +27,7 @@ class NotificationsState with ChangeNotifier {
     return "${getAccurateDate().day}. ${getAccurateDate().month}. ${getAccurateDate().year}. g";
   }
 
-  String timeToString() {
+  String timeToString(TimeOfDay time) {
     String addLeadingZeroIfNeeded(int value) {
       if (value < 10) {
         return '0$value';
@@ -35,8 +35,8 @@ class NotificationsState with ChangeNotifier {
       return value.toString();
     }
 
-    final String hourLabel = addLeadingZeroIfNeeded(getAccurateTime().hour);
-    final String minuteLabel = addLeadingZeroIfNeeded(getAccurateTime().minute);
+    final String hourLabel = addLeadingZeroIfNeeded(time.hour);
+    final String minuteLabel = addLeadingZeroIfNeeded(time.minute);
 
     return '$hourLabel:$minuteLabel';
   }

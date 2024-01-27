@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:rehearse_app/models/reminder_model.dart';
-import 'package:rehearse_app/reminders/dismissable_bottom_sheet.dart';
-
+import 'package:rehearse_app/notes/dialog_state.dart';
 import 'package:rehearse_app/reminders/notifications_state.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
@@ -19,6 +18,9 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
+  late Future<List<Reminder>> remindersFuture =
+      _databaseHelper.getRemindersDatabase();
+  List<Reminder> reminders = [];
   int pageIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -29,19 +31,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             builder: (context, child) {
               var state = Provider.of<NotificationsState>(context);
               String selectedDate = state.dateToString();
-              String selectedTime = state.timeToString();
+              String selectedTime = state.timeToString(state.getAccurateTime());
               return Scaffold(
                   resizeToAvoidBottomInset: false,
                   appBar: AppBar(
-                    leading: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
-                        FontAwesomeIcons.backward,
-                        color: accentLight,
-                        size: 30,
+                      leading: IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(
+                          FontAwesomeIcons.backward,
+                          color: accentLight,
+                          size: 30,
+                        ),
                       ),
-                    ),
-                  ),
+                      centerTitle: true,
+                      title: Text(
+                          pageIndex == 0
+                              ? "Novi podsjetnik"
+                              : "Zakazani podsjetnici",
+                          style: pBold.copyWith(color: white))),
                   body: Builder(builder: (context) {
                     if (pageIndex == 0) {
                       return Container(
@@ -195,7 +202,126 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                       );
                     }
-                    return Placeholder();
+                    return Container(
+                      alignment: Alignment.center,
+                      color: Colors.black12,
+                      padding: const EdgeInsets.only(left: 20, top: 10),
+                      child: FutureBuilder(
+                          future: remindersFuture,
+                          builder: (context, snapshot) {
+                            reminders = snapshot.data ?? [];
+                            if (!snapshot.hasData || reminders.isEmpty) {
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Sve isposlato!",
+                                      style: p1.copyWith(color: white)),
+                                  ElevatedButton.icon(
+                                      icon: const Icon(
+                                        FontAwesomeIcons.arrowLeft,
+                                        color: white,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          pageIndex = 0;
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          shape: const RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                  color: Colors.white))),
+                                      label: Text(
+                                        "Zakaži novi",
+                                        style: p1.copyWith(color: white),
+                                      ))
+                                ],
+                              );
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return ListView.builder(
+                                itemCount: reminders.length,
+                                itemBuilder: (context, index) {
+                                  DateTime date = DateTime.parse(
+                                      reminders[index].Iso8601scheduledTime);
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 10.0),
+                                    child: ListTile(
+                                      shape: const RoundedRectangleBorder(
+                                          side: BorderSide(color: white)),
+                                      tileColor: Colors.black87,
+                                      title: Text(
+                                        "${date.day}. ${date.month}. | ${state.timeToString(TimeOfDay.fromDateTime(date))}",
+                                        style: pBold.copyWith(color: white),
+                                      ),
+                                      subtitle: Text(
+                                          reminders[index].reminderContent),
+                                      trailing: IconButton.outlined(
+                                        onPressed: () async {
+                                          DialogData.BuildDialog(
+                                            context,
+                                            Text("Otkazati?", style: pBold),
+                                            Text(
+                                              "Da li sigurno želiš obrisati ${reminders[index].reminderContent}?",
+                                              style: p2,
+                                            ),
+                                            [
+                                              TextButton(
+                                                  child: Text(
+                                                    "Odustani",
+                                                    style: p3.copyWith(
+                                                        color: black),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  }),
+                                              ElevatedButton.icon(
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(Colors.red)),
+                                                  icon: const Icon(
+                                                      Icons.sticky_note_2,
+                                                      color: white),
+                                                  label: Text(
+                                                    "Obriši",
+                                                    style: p3.copyWith(
+                                                        color: white),
+                                                  ),
+                                                  onPressed: () {
+                                                    RehearseAppNotificationManager
+                                                        .cancelNotification(
+                                                            reminders[index]
+                                                                .id!);
+                                                    _databaseHelper
+                                                        .deleteReminder(
+                                                            reminders[index]);
+                                                    setState(() {
+                                                      remindersFuture =
+                                                          _databaseHelper
+                                                              .getRemindersDatabase();
+                                                    });
+                                                  }),
+                                            ],
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          FontAwesomeIcons.trashCan,
+                                          color: white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                            return const CircularProgressIndicator(
+                              color: Colors.greenAccent,
+                            );
+                          }),
+                    );
                   }),
                   bottomNavigationBar: BottomNavigationBar(
                     currentIndex: pageIndex,
@@ -213,13 +339,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           FontAwesomeIcons.list,
                           size: 20,
                         ),
-                        label: 'Lista',
+                        label: 'Lista zakazanih',
                       ),
                     ],
                     backgroundColor: Colors.black38,
                     onTap: (int idx) {
                       setState(() {
                         pageIndex = idx;
+                        _getUnsentNotifications();
                       });
                     },
                   ));
@@ -265,11 +392,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
     _databaseHelper.insertReminder(
       Reminder(
-        id: reminderId + 1,
         Iso8601scheduledTime: finalDate.toIso8601String(),
         reminderContent: state.controller.text,
       ),
     );
+    remindersFuture = _databaseHelper.getRemindersDatabase();
     state.controller.text = "";
     DismissableBottomSheet.show(
         context: context,
@@ -277,5 +404,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         backgroundColor: Colors.green,
         content: Text("Dogovoreno! U ta doba te zvrcnemo!",
             style: p1.copyWith(color: white)));
+  }
+
+  _getUnsentNotifications() {
+    for (var reminder in reminders) {
+      if (DateTime.parse(reminder.Iso8601scheduledTime)
+              .compareTo(DateTime.now()) <=
+          0) {
+        _databaseHelper.deleteReminder(reminder);
+      }
+    }
+    remindersFuture = _databaseHelper.getRemindersDatabase();
   }
 }
