@@ -93,7 +93,7 @@ class _QuizScreenState extends State<QuizScreen> {
             MaterialPageRoute(
               builder: (context) => const CreateTestDialog(),
             ))
-        : DialogData().BuildDialog(
+        : DialogData.BuildDialog(
             context,
             Text(
               "Sigurno?",
@@ -386,7 +386,7 @@ class WrittenAnswerQuestionPage extends StatelessWidget {
                   ),
                   onPressed: () {
                     if (controller.text == '') {
-                      DialogData().BuildDialog(
+                      DialogData.BuildDialog(
                           context,
                           Text("Nije sramota", style: pBold),
                           Text("Barem pokušaj nešto unijeti.",
@@ -394,7 +394,7 @@ class WrittenAnswerQuestionPage extends StatelessWidget {
                           [
                             ElevatedButton(
                                 onPressed: () => Navigator.pop(context),
-                                child: Text("Ok")),
+                                child: const Text("Ok")),
                           ]);
                     } else {
                       _writtenTestBottomSheet(
@@ -556,6 +556,7 @@ class CongratsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var state = Provider.of<QuizState>(context);
+    FocusManager.instance.primaryFocus?.unfocus();
     final double percentage = double.parse(
         (((state.correctQuestionsIndex / quiz.questions.length) * 100)
             .toStringAsFixed(2)));

@@ -14,6 +14,9 @@ class RehearseAppNotificationManager {
         'channel name',
         channelDescription: 'channel description',
         fullScreenIntent: true,
+        priority: Priority.high,
+        enableLights: true,
+        importance: Importance.high,
       ),
       iOS: DarwinNotificationDetails(),
     );
@@ -26,11 +29,12 @@ class RehearseAppNotificationManager {
       requestBadgePermission: false,
       requestAlertPermission: false,
     );
+
     final initConfig = InitializationSettings(android: android, iOS: iOS);
-    await _notificationsPlugin.initialize(initConfig,
-        onDidReceiveNotificationResponse: (details) async {
-      recievedResponses.add(details.payload);
-    });
+
+    await _notificationsPlugin.initialize(
+      initConfig,
+    );
   }
 
   static Future<void> cancelAll() async {

@@ -2,18 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>241553071863-pdin6k5hcc6i5lj9ms91ksojplvi3shh.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.241553071863-pdin6k5hcc6i5lj9ms91ksojplvi3shh</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDpJSIFUSfWuxGPNXn5T7GiNlVko2TRtP8</string>
+	<string>AIzaSyCHZBmTciCbBhQMts2qGVbVZtUxlzD61qI</string>
 	<key>GCM_SENDER_ID</key>
-	<string>941083888355</string>
+	<string>241553071863</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.gelegenheit.rehearseApp</string>
 	<key>PROJECT_ID</key>
-	<string>rehearseapp-d9c43</string>
+	<string>rehearse-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>rehearseapp-d9c43.appspot.com</string>
+	<string>rehearse-app.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:941083888355:ios:a78d61e782997ef58813d6</string>
+	<string>1:241553071863:ios:a366893875903363597df2</string>
 </dict>
 </plist>

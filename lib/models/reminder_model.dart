@@ -1,6 +1,6 @@
 class Reminder {
   Reminder({
-    required this.id,
+    this.id,
     this.reminderTitle,
     required this.reminderContent,
     required this.Iso8601scheduledTime,
@@ -18,10 +18,4 @@ class Reminder {
       'scheduled_at': Iso8601scheduledTime,
     };
   }
-
-  Reminder.withoutID({
-    this.reminderTitle,
-    required this.reminderContent,
-    required this.Iso8601scheduledTime,
-  });
 }

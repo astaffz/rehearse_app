@@ -26,7 +26,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
       _databaseHelper.getCategoriesDatabase();
   List<Note> notes = [];
   List<int> categoryFilter = [];
-
+  bool buttonsEnabled = true;
+  static bool appBarCollapsed = false;
   @override
   void initState() {
     super.initState();
@@ -53,14 +54,14 @@ class _NotebookScreenState extends State<NotebookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool buttonsEnabled = notes.isNotEmpty;
     return Hero(
       tag: 'option.select',
       child: Scaffold(
         backgroundColor: accentLight,
+        resizeToAvoidBottomInset: false,
         // ADD BUTTON
         floatingActionButton: IconButton.filled(
-          icon: const Icon(Icons.add, color: white),
+          icon: const Icon(FontAwesomeIcons.notesMedical, color: white),
           onPressed: () async {
             List dialogInputs = [];
             dialogInputs = await openDialog() ?? [];
@@ -79,43 +80,32 @@ class _NotebookScreenState extends State<NotebookScreen> {
         body: FutureBuilder(
             future: notesFuture,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 5),
-                    Container(
-                      alignment: Alignment.topLeft,
-                      padding: const EdgeInsets.all(10.0),
-                      child: IconButton.outlined(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          iconSize: 35,
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(
-                            FontAwesomeIcons.xmark,
-                            color: black,
-                          )),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, top: 5),
-                      child: Text(
-                        softWrap: true,
-                        textAlign: TextAlign.left,
-                        "Moji \nzapisi",
-                        style: TextStyle(
-                            fontSize: 48,
-                            fontFamily: pBold.fontFamily,
-                            color: black),
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 5),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, top: 5),
+                        child: Text(
+                          softWrap: true,
+                          "Moji zapisi",
+                          style: TextStyle(
+                              fontSize: 48,
+                              fontFamily: pBold.fontFamily,
+                              color: black),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(
-                          color: icon,
-                        )),
-                  ],
+                      const SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: CircularProgressIndicator(
+                            color: icon,
+                          )),
+                    ],
+                  ),
                 );
               } else if (snapshot.hasError) {
                 // return: show error widget
@@ -124,6 +114,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
               notes = snapshot.data ?? [];
 
               // Plain display when there are saved notes
+
               if (notes.isEmpty) {
                 buttonsEnabled = false;
               } else {
@@ -136,205 +127,196 @@ class _NotebookScreenState extends State<NotebookScreen> {
               return NestedScrollView(
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 3.0),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton.outlined(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  iconSize: 35,
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  icon: const Icon(
-                                    FontAwesomeIcons.xmark,
-                                    color: black,
-                                  )),
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  buttonsEnabled || categoryFilter.isNotEmpty
-                                      ? showDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              const CreateTestDialog(),
-                                        )
-                                      : DialogData().BuildDialog(
-                                          context,
-                                          Text("Trenutno nemoguće",
-                                              style: pBold),
-                                          Text(
-                                            "Dodaj koji zapis prije nego što se ispitaš!",
-                                            style: p2,
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          [
-                                              ElevatedButton(
-                                                style: ButtonStyle(
-                                                    backgroundColor:
-                                                        MaterialStateProperty
-                                                            .all(
-                                                  Colors.red,
-                                                )),
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                                child: Text(
-                                                  "OK",
-                                                  style:
-                                                      p2.copyWith(color: white),
-                                                ),
-                                              )
-                                            ]);
-                                },
-                                icon: const Icon(
-                                    FontAwesomeIcons.clipboardQuestion,
-                                    color: white),
-                                style: ButtonStyle(
-                                    shape: MaterialStateProperty.all(
-                                      const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
+                    padding: const EdgeInsets.symmetric(vertical: 3.0),
+                    sliver: SliverAppBar(
+                      pinned: true,
+                      backgroundColor: accentLight,
+                      centerTitle: true,
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: IconButton(
+                          iconSize: 35,
+                          icon: const Icon(
+                            FontAwesomeIcons.backward,
+                            color: black,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      actions: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              if (buttonsEnabled || categoryFilter.isNotEmpty) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      const CreateTestDialog(),
+                                );
+                              } else {
+                                DialogData.BuildDialog(
+                                  context,
+                                  Text("Trenutno nemoguće", style: pBold),
+                                  Text(
+                                    "Dodaj koji zapis prije nego što se ispitaš!",
+                                    style: p2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                        Colors.red,
+                                      )),
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(
+                                        "OK",
+                                        style: p2.copyWith(color: white),
                                       ),
-                                    ),
-                                    padding: MaterialStateProperty.all(
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 10)),
-                                    backgroundColor: buttonsEnabled ||
-                                            categoryFilter.isNotEmpty
-                                        ? MaterialStateProperty.all(icon)
-                                        : MaterialStateProperty.all(
-                                            Colors.black26)),
-                                label: Text(
-                                  "Ispitaj me",
-                                  style: pBold.copyWith(fontSize: 15),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, top: 20, bottom: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  softWrap: true,
-                                  "Moji \nzapisi",
-                                  style: TextStyle(
-                                      fontSize: 48,
-                                      fontFamily: pBold.fontFamily,
-                                      color: black),
-                                ),
-                              ],
+                                    )
+                                  ],
+                                );
+                              }
+                            },
+                            icon: const Icon(FontAwesomeIcons.noteSticky,
+                                color: white),
+                            label: Text(
+                              "Test",
+                              style: pBold.copyWith(
+                                  color: white, fontSize: p2.fontSize),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 20),
-                            child: Text(
-                              "kategorije:",
-                              style: dialogText.copyWith(fontSize: p1.fontSize),
-                            ),
-                          ),
-                          Container(
-                            height: 30,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15.0),
-                                  child: IconButton.filled(
-                                    iconSize: 15,
-                                    onPressed: null,
-                                    icon: const Icon(Icons.add),
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                Colors.black54),
-                                        foregroundColor:
-                                            MaterialStateProperty.all(white)),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: List.generate(
-                                      categories.length,
-                                      (index) {
-                                        NoteType buttonCategory =
-                                            categories[index];
-                                        return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 5.0),
-                                            child: ElevatedButton.icon(
-                                              icon: Icon(
-                                                buttonCategory.leftIcon!.icon,
-                                                color: white,
-                                              ),
-                                              label: Text(
-                                                categories[index]
-                                                    .name
-                                                    .capitalize(),
-                                                style:
-                                                    p3.copyWith(color: white),
-                                              ),
-                                              onPressed: () {
-                                                buttonsEnabled ||
-                                                        categoryFilter
-                                                            .isNotEmpty
-                                                    ? setState(() {
-                                                        if (!categoryFilter
-                                                            .contains(
-                                                                buttonCategory
-                                                                    .categoryID)) {
-                                                          categoryFilter.add(
-                                                              buttonCategory
-                                                                  .categoryID);
-                                                        } else {
-                                                          categoryFilter.remove(
-                                                              buttonCategory
-                                                                  .categoryID);
-                                                        }
-                                                        categoryFilter
-                                                                .isNotEmpty
-                                                            ? _update(
-                                                                categoryFilter)
-                                                            : _update();
-                                                      })
-                                                    : null;
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      categoryFilter.contains(
-                                                              buttonCategory
-                                                                  .categoryID)
-                                                          ? accent
-                                                          : Colors.black38),
-                                            ));
-                                      },
+                            style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                  const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                                padding: MaterialStateProperty.all(
+                                    const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 10)),
+                                backgroundColor:
+                                    MaterialStateProperty.all(icon)),
                           ),
-                        ],
+                        ),
+                      ],
+                      forceElevated: innerBoxIsScrolled,
+                      collapsedHeight: 100,
+                      expandedHeight: 240.0,
+                      flexibleSpace: Padding(
+                        padding: const EdgeInsets.only(top: 50.0),
+                        child: FlexibleSpaceBar(
+                          collapseMode: CollapseMode.pin,
+                          titlePadding:
+                              const EdgeInsets.only(left: 20, bottom: 5),
+                          title: Text(
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                            "Moji zapisi",
+                            overflow: TextOverflow.visible,
+                            style: TextStyle(
+                                fontSize: 36,
+                                fontFamily: pBold.fontFamily,
+                                color: black),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
-                body: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Accordion(
-                    paddingBetweenClosedSections: 5,
-                    maxOpenSections: 3,
-                    scaleWhenAnimating: false,
-                    children: createSections(notes, context),
-                  ),
+                body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text(
+                        "kategorije:",
+                        style: dialogText.copyWith(fontSize: p1.fontSize),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15.0),
+                            child: IconButton.filled(
+                              iconSize: 15,
+                              onPressed: null,
+                              icon: const Icon(Icons.add),
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.black54),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(white)),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                children:
+                                    List.generate(categories.length, (index) {
+                                  NoteType buttonCategory = categories[index];
+                                  return Padding(
+                                      padding: const EdgeInsets.only(left: 5.0),
+                                      child: ElevatedButton.icon(
+                                        icon: Icon(
+                                          buttonCategory.leftIcon!.icon,
+                                          color: white,
+                                        ),
+                                        label: Text(
+                                          buttonCategory.name.capitalize(),
+                                          style: p3.copyWith(color: white),
+                                        ),
+                                        onPressed: () {
+                                          buttonsEnabled ||
+                                                  categoryFilter.isNotEmpty
+                                              ? setState(() {
+                                                  if (!categoryFilter.contains(
+                                                      buttonCategory
+                                                          .categoryID)) {
+                                                    categoryFilter.add(
+                                                        buttonCategory
+                                                            .categoryID);
+                                                  } else {
+                                                    categoryFilter.remove(
+                                                        buttonCategory
+                                                            .categoryID);
+                                                  }
+                                                  categoryFilter.isNotEmpty
+                                                      ? _update(categoryFilter)
+                                                      : _update();
+                                                })
+                                              : null;
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: categoryFilter
+                                                    .contains(buttonCategory
+                                                        .categoryID)
+                                                ? accent
+                                                : Colors.black38),
+                                      ));
+                                })),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Accordion(
+                        paddingBetweenClosedSections: 5,
+                        maxOpenSections: 3,
+                        scaleWhenAnimating: false,
+                        children: createSections(notes, context),
+                      ),
+                    ),
+                  ],
                 ),
               );
             }),
@@ -365,8 +347,8 @@ class _NotebookScreenState extends State<NotebookScreen> {
                   hasNote = true;
                 }
                 return AlertDialog(
-                    titlePadding: EdgeInsets.zero,
                     alignment: dialogAlignment,
+                    titlePadding: EdgeInsets.zero,
                     backgroundColor: white,
                     title: Container(
                       margin: EdgeInsets.zero,
@@ -391,6 +373,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                             child: TextField(
                               controller: controllerTerm,
                               style: pBold,
+                              maxLines: 1,
                               decoration: InputDecoration(
                                 labelText: "Pojam:",
                                 labelStyle: p1.copyWith(color: white),
@@ -402,37 +385,43 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               ),
                             ),
                           ),
-                          DropdownMenu<NoteType>(
+                          SizedBox(
                             width: 40,
-                            trailingIcon: const Icon(null),
-                            selectedTrailingIcon: const Icon(null),
-                            leadingIcon: Icon(
-                              Provider.of<DialogData>(context, listen: true)
-                                  .noteCategory
-                                  .leftIcon
-                                  ?.icon,
-                              color: white,
-                            ),
-                            enableSearch: false,
-                            initialSelection:
+                            height: 50,
+                            child: DropdownMenu<NoteType>(
+                              trailingIcon: const Icon(null),
+                              selectedTrailingIcon: const Icon(null),
+                              expandedInsets: EdgeInsets.zero,
+                              leadingIcon: Icon(
                                 Provider.of<DialogData>(context, listen: true)
-                                    .noteCategory,
-                            menuStyle: MenuStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Provider.of<DialogData>(context,
-                                            listen: true)
-                                        .dialogColor)),
-                            onSelected: (current) {
-                              Provider.of<DialogData>(context, listen: false)
-                                  .onChanged(current!);
-                            },
-                            dropdownMenuEntries: categories
-                                .map<DropdownMenuEntry<NoteType>>(
-                                    (NoteType category) {
-                              return DropdownMenuEntry<NoteType>(
-                                  value: category,
-                                  label: category.name.capitalize());
-                            }).toList(),
+                                    .noteCategory
+                                    .leftIcon
+                                    ?.icon,
+                                color: white,
+                              ),
+                              enableSearch: false,
+                              initialSelection:
+                                  Provider.of<DialogData>(context, listen: true)
+                                      .noteCategory,
+                              menuStyle: MenuStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.resolveWith(
+                                          (states) => Provider.of<DialogData>(
+                                                  context,
+                                                  listen: true)
+                                              .dialogColor)),
+                              onSelected: (current) {
+                                Provider.of<DialogData>(context, listen: false)
+                                    .onChanged(current!);
+                              },
+                              dropdownMenuEntries: categories
+                                  .map<DropdownMenuEntry<NoteType>>(
+                                      (NoteType category) {
+                                return DropdownMenuEntry<NoteType>(
+                                    value: category,
+                                    label: category.name.capitalize());
+                              }).toList(),
+                            ),
                           ),
                         ],
                       ),
@@ -457,8 +446,9 @@ class _NotebookScreenState extends State<NotebookScreen> {
                     actions: [
                       ElevatedButton.icon(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Provider.of<DialogData>(context, listen: true)
+                            backgroundColor: MaterialStateProperty.resolveWith(
+                                (states) => Provider.of<DialogData>(context,
+                                        listen: true)
                                     .dialogColor)),
                         icon: const Icon(Icons.sticky_note_2, color: white),
                         onPressed: () {
@@ -537,7 +527,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       IconButton(
                         // DELETE BUTTON
                         onPressed: () {
-                          DialogData().BuildDialog(
+                          DialogData.BuildDialog(
                             context,
                             Text("Obrisati?", style: pBold),
                             Text(
