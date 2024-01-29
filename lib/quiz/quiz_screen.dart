@@ -5,7 +5,7 @@ import 'package:rehearse_app/models/quiz_model.dart';
 import 'package:rehearse_app/notes/create_test_dialog.dart';
 import 'package:rehearse_app/shared/progress_bar.dart';
 import 'package:rehearse_app/shared/styles.dart';
-import 'package:rehearse_app/notes/dialog_state.dart';
+import 'package:rehearse_app/shared/dialog_state.dart';
 import 'package:rehearse_app/quiz/quiz_state.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -87,47 +87,41 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _exitQuiz(QuizState state, BuildContext context) {
-    state.controller.page == 0
-        ? Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CreateTestDialog(),
-            ))
-        : DialogData.BuildDialog(
-            context,
-            Text(
-              "Sigurno?",
-              style: pBold,
+    DialogData.BuildDialog(
+      context,
+      Text(
+        "Sigurno?",
+        style: pBold,
+      ),
+      Text(
+        "Ako izađeš, tvoj napredak ovdje će biti izgubiti.",
+        style: p2,
+        textAlign: TextAlign.center,
+      ),
+      [
+        TextButton(
+            child: Text(
+              "Odustani",
+              style: p3.copyWith(color: black),
             ),
-            Text(
-              "Ako izađeš, tvoj napredak ovdje će biti izgubiti.",
-              style: p2,
-              textAlign: TextAlign.center,
-            ),
-            [
-              TextButton(
-                  child: Text(
-                    "Odustani",
-                    style: p3.copyWith(color: black),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  }),
-              ElevatedButton.icon(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.red)),
-                icon: const Icon(Icons.sticky_note_2, color: white),
-                label: Text(
-                  "Izađi",
-                  style: p3.copyWith(color: white),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        ElevatedButton.icon(
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.red)),
+          icon: const Icon(Icons.sticky_note_2, color: white),
+          label: Text(
+            "Izađi",
+            style: p3.copyWith(color: white),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
 }
 
@@ -526,6 +520,7 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var state = Provider.of<QuizState>(context);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

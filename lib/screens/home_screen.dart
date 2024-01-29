@@ -19,27 +19,27 @@ class HomeScreen extends StatelessWidget {
       "Pozdrav vizionaru, kako oblikuješ budućnost danas?",
       "Gdje si pobjedniče, osvajaš li svoje bitke danas?",
       "Gdje si inspiracijo, kako širiš svoju svjetlost danas?",
-      "O magijo, kakvo čudo danas nas očekuje?",
+      "Ej magijo, kakvo čudo danas nas očekuje?",
       "Poštovanje kapetane, kuda plovimo danas?",
       "Gdje si lavino, kakve prepreke danas rušimo?",
       "Poštovanje velikane, i danas dominiramo?",
-      "Izvoli šefe, šta treba?",
       "Ćao lave, samo nastavi!",
-      "O šampionu, i danas punom parom?",
+      "Oho šampionu, i danas punom parom?",
       "Gdje si zvijezdo, koliko nam danas sijajiš?",
-    ]; // TODO: Add more messages
+    ];
     List<String> options = ["Moji zapisi", "Moji podsjetnici", "Moj reader"];
     final random = Random();
 
     return StreamBuilder(
       stream: AuthService().userStream,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        Widget screen;
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashScreen();
+          screen = const SplashScreen();
         } else if (!snapshot.hasData) {
-          return const LoginScreen();
+          screen = const LoginScreen();
         } else {
-          return Scaffold(
+          screen = Scaffold(
             backgroundColor: icon.withAlpha(200),
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,6 +74,7 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         }
+        return screen;
       },
     );
   }

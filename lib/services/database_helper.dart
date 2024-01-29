@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+
 import 'package:rehearse_app/models/note_model.dart';
 import 'package:rehearse_app/models/reminder_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -17,6 +19,7 @@ class DatabaseHelper {
 
   final String tableCategories = 'categories';
   final String colTitle = 'title';
+  final String colColor = "color";
 
   final String tableReminders = "reminders";
   final String colContent = "content";
@@ -86,7 +89,8 @@ class DatabaseHelper {
     db.execute("""
 CREATE TABLE IF NOT EXISTS $tableCategories (
     $columnId INTEGER PRIMARY KEY ASC AUTOINCREMENT,
-    $colTitle       TEXT    NOT NULL DEFAULT defaultType
+    $colTitle       TEXT    NOT NULL DEFAULT defaultType,
+    $colColor  TEXT  NOT NULL
 )
 """);
     db.execute("""
@@ -97,14 +101,16 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
     $colDateTime  TEXT    NOT NULL)
                         """);
 
-    db.insert(tableCategories, {columnId: 0, colTitle: "defaultType"},
+    db.insert(tableCategories,
+        {columnId: 0, colTitle: "standard", colColor: "d6ad60"},
         conflictAlgorithm: ConflictAlgorithm.ignore);
-    db.insert(tableCategories, {columnId: 1, colTitle: "important"},
+    db.insert(tableCategories,
+        {columnId: 1, colTitle: "important", colColor: "ff0000"},
         conflictAlgorithm: ConflictAlgorithm.ignore);
     db.insert(tableNotes, {
       columnId: 0,
-      colTerm: "notes",
-      colDefinition: "test",
+      colTerm: "Murphy's law",
+      colDefinition: "Ako nešto može poći po zlu, poći će sigurno!",
       colCategoryId: 0
     });
   }
@@ -199,12 +205,11 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
         await db!.query(tableCategories);
 
     return List.generate(mappedTypes.length, (i) {
+      Color colorCode = Color(int.parse('0xFF${mappedTypes[i][colColor]}'));
       return NoteType(
           categoryID: mappedTypes[i][columnId] as int,
           name: mappedTypes[i][colTitle] as String,
-          headerBackgroundColor: defaultType
-              .headerBackgroundColor // TODO: Implement colors into DB
-          );
+          headerBackgroundColor: colorCode);
     });
   }
 

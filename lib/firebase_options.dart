@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '241553071863',
     projectId: 'rehearse-app',
     storageBucket: 'rehearse-app.appspot.com',
+    iosClientId: '241553071863-pdin6k5hcc6i5lj9ms91ksojplvi3shh.apps.googleusercontent.com',
     iosBundleId: 'com.gelegenheit.rehearseApp',
   );
 }

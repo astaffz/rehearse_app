@@ -17,8 +17,28 @@ void main() async {
 }
 
 extension StringExtension on String {
-  String capitalize() {
+  String capitalized() {
     return replaceFirst(this[0], this[0].toUpperCase());
+  }
+}
+
+extension HexColor on Color {
+  String _generateAlpha({required int alpha, required bool withAlpha}) {
+    if (withAlpha) {
+      return alpha.toRadixString(16).padLeft(2, '0');
+    } else {
+      return '';
+    }
+  }
+
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+
+  Color hexToColor(String code) {
+    return Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
   }
 }
 

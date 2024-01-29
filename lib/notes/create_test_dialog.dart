@@ -3,13 +3,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:rehearse_app/main.dart';
 import 'package:rehearse_app/quiz/quiz_screen.dart';
+import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:rehearse_app/models/note_model.dart';
-import 'package:rehearse_app/notes/dialog_state.dart';
+import 'package:rehearse_app/shared/dialog_state.dart';
 
 class CreateTestDialog extends StatefulWidget {
-  const CreateTestDialog({super.key});
-
+  CreateTestDialog({super.key, required this.categories});
+  final List<NoteType> categories;
   @override
   State<CreateTestDialog> createState() => _CreateTestDialogState();
 }
@@ -20,7 +21,10 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
   QuestionType selectedQuestionType = QuestionType.multipleChoice;
   List<int> selectedCategories = [];
   bool allCategoriesSelected = false;
+  final DatabaseHelper databaseHelper = DatabaseHelper();
+  int noteCount = 0;
   final MultiSelectController _categorycontroller = MultiSelectController();
+
   @override
   Widget build(BuildContext context) {
     return Dialog.fullscreen(
@@ -100,7 +104,7 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                     child: MultiSelectDropDown(
                       hint: "Odaberi: ",
                       controller: _categorycontroller,
-                      dropdownHeight: 90,
+                      dropdownHeight: 130,
                       hintStyle: pBold.copyWith(color: black),
                       selectedOptionBackgroundColor: white,
                       chipConfig: ChipConfig(
@@ -118,7 +122,8 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
 
                         // The value that the 'Svi zapisi' checkbox depends on
                         // It should align with the selection
-                        if (selectedOptions.length != categories.length) {
+                        if (selectedOptions.length !=
+                            widget.categories.length) {
                           setState(() {
                             allCategoriesSelected = false;
                           });
@@ -130,10 +135,11 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                       },
                       optionTextStyle: p2,
                       options: List.generate(
-                          categories.length,
+                          widget.categories.length,
                           (index) => ValueItem<int>(
-                              label: categories[index].name.capitalize(),
-                              value: categories[index].categoryID)),
+                              label:
+                                  widget.categories[index].name.capitalized(),
+                              value: widget.categories[index].categoryID)),
                     ),
                   ),
                   Checkbox(
@@ -178,16 +184,24 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
     );
   }
 
-  void validateOptions(BuildContext context) {
-    if (_categorycontroller.selectedOptions.isEmpty) {
-      return DialogData.BuildDialog(
+  void validateOptions(BuildContext context) async {
+    selectedCategories = List.generate(
+        _categorycontroller.selectedOptions.length,
+        (index) => _categorycontroller.selectedOptions[index].value);
+
+    List selectedNotes =
+        await databaseHelper.notesByCategoryQuery(selectedCategories);
+    noteCount = selectedNotes.length;
+    if (_categorycontroller.selectedOptions.isEmpty || noteCount == 0) {
+      // ignore: use_build_context_synchronously
+      DialogData.BuildDialog(
         context,
         Text(
           "Nepotpun zahtjev",
           style: pBold,
         ),
         Text(
-          "Odaberi bar jednu kategoriju!",
+          "Nijedan zapis nije odabran!",
           textAlign: TextAlign.center,
           style: p2,
         ),
@@ -203,11 +217,11 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
           ),
         ],
       );
+      return;
     }
-    selectedCategories = List.generate(
-        _categorycontroller.selectedOptions.length,
-        (index) => _categorycontroller.selectedOptions[index].value);
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
+    // ignore: use_build_context_synchronously
     Navigator.push(
         context,
         MaterialPageRoute(

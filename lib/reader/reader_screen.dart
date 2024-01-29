@@ -20,7 +20,7 @@ class ReaderScreen extends StatefulWidget {
 
 class _ReaderScreenState extends State<ReaderScreen> {
   TextEditingController textController = TextEditingController();
-  SpeedReadCounter counter = SpeedReadCounter();
+  SpeedReadCounter counter = SpeedReadCounter(wordsPerMinute: 60);
 
   @override
   void dispose() {
@@ -49,7 +49,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   centerTitle: true,
                   backgroundColor: widgetColor,
                   title: Text(
-                    "ReaderApp",
+                    "Moj reader",
                     style: pBold.copyWith(color: black),
                   ),
                   leading: SizedBox(
@@ -150,6 +150,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                         child: TextField(
                           controller: textController,
                           style: p1,
+                          onTapOutside: (event) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
                           decoration: InputDecoration(
                               alignLabelWithHint: true,
                               label: Text(
@@ -193,7 +195,17 @@ class _ReaderScreenState extends State<ReaderScreen> {
                             Expanded(
                               child: ElevatedButton.icon(
                                   onPressed: () {
-                                    if (textController.text.isEmpty) return;
+                                    if (textController.text.isEmpty) {
+                                      DismissableBottomSheet.show(
+                                          context: context,
+                                          durationInSeconds: 5,
+                                          content: Text("Tekst je prazan!",
+                                              textAlign: TextAlign.center,
+                                              style:
+                                                  p1.copyWith(color: white)));
+                                      return;
+                                    }
+
                                     Clipboard.setData(ClipboardData(
                                         text: textController.text));
                                     DismissableBottomSheet.show(
@@ -215,7 +227,16 @@ class _ReaderScreenState extends State<ReaderScreen> {
                             Expanded(
                               child: ElevatedButton.icon(
                                   onPressed: () {
-                                    if (textController.text.isEmpty) return;
+                                    if (textController.text.isEmpty) {
+                                      DismissableBottomSheet.show(
+                                          context: context,
+                                          durationInSeconds: 5,
+                                          content: Text("Tekst je prazan!",
+                                              textAlign: TextAlign.center,
+                                              style:
+                                                  p1.copyWith(color: white)));
+                                      return;
+                                    }
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(
                                       builder: (context) => SpeedReedScreen(
@@ -377,7 +398,7 @@ class _cameraViewState extends State<_cameraView> {
       double xOffset = (focusPointX / fullWidth).clamp(0, 1);
       double yOffset = (focusPointX / cameraHeight).clamp(0, 1);
       Offset point = Offset(xOffset, yOffset);
-
+      await _controller?.setFocusMode(FocusMode.auto);
       await _controller?.setFocusPoint(point);
 
       setState(() {
@@ -405,7 +426,7 @@ class _cameraViewState extends State<_cameraView> {
       if (!mounted) {
         return;
       }
-      _controller?.setFocusMode(FocusMode.auto);
+
       _controller?.getMinZoomLevel().then((value) {
         CameraReaderHandler.currentZoomLevel = value;
         CameraReaderHandler.minAvailableZoom = value;
@@ -426,7 +447,7 @@ class _cameraViewState extends State<_cameraView> {
     } else {
       try {
         await _controller?.stopImageStream();
-      } catch (CameraException) {
+      } catch (e) {
         return;
       }
     }

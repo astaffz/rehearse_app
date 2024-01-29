@@ -5,15 +5,31 @@ import 'package:rehearse_app/models/note_model.dart';
 import 'package:rehearse_app/shared/styles.dart';
 
 class DialogData with ChangeNotifier {
+  DialogData({required this.categories});
+  final List<NoteType> categories;
   NoteType noteCategory = defaultType;
-  Color dialogColor = defaultType.headerBackgroundColor;
+  Color? dialogColor = defaultType.headerBackgroundColor;
   bool hasNote = false;
-
+  bool hasCategory = false;
   void setDialog(Note? note) {
     if (note != null && hasNote == false) {
-      dialogColor = categories[note.categoryID].headerBackgroundColor;
-      noteCategory = categories[note.categoryID];
+      dialogColor = categories
+          .firstWhere((element) => element.categoryID == note.categoryID)
+          .headerBackgroundColor;
+      noteCategory = categories
+          .firstWhere((element) => element.categoryID == note.categoryID);
     }
+  }
+
+  void setCategoryDialog(NoteType? category) {
+    if (category != null && hasCategory == false) {
+      dialogColor = category.headerBackgroundColor;
+    }
+  }
+
+  void updateCategory(Color color) {
+    dialogColor = color;
+    notifyListeners();
   }
 
   void onChanged(NoteType selectedCategory) {
@@ -22,7 +38,7 @@ class DialogData with ChangeNotifier {
     notifyListeners();
   }
 
-  static void BuildDialog(BuildContext context, Widget title, Widget content,
+  static BuildDialog(BuildContext context, Widget title, Widget content,
       List<Widget> actions) {
     showDialog(
       context: context,
