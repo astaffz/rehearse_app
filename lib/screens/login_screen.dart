@@ -33,13 +33,6 @@ class LoginScreen extends StatelessWidget {
                         color: Colors.blueAccent,
                       ),
                       LoginButton(
-                        icon: FontAwesomeIcons.userTie,
-                        text: "Kreiraj svoj profil",
-                        method: AuthService()
-                            .anonLogin, //TODO: Burageru napravi profile za ovaj brat, more!
-                        color: heading,
-                      ),
-                      LoginButton(
                         icon: FontAwesomeIcons.magnifyingGlassArrowRight,
                         text: "Možda kasnije",
                         method: AuthService().anonLogin,

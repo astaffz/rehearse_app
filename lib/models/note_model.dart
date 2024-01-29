@@ -3,17 +3,19 @@ import 'package:rehearse_app/shared/shared.dart';
 
 class NoteType {
   const NoteType({
-    required this.categoryID,
+    this.categoryID,
     required this.name,
-    required this.headerBackgroundColor,
+    this.headerBackgroundColor,
+    this.colorHex,
     this.headerBackgroundColorOpened,
     this.headerBorderColor,
     this.headerBorderColorOpened,
     this.leftIcon,
   });
-  final int categoryID;
+  final int? categoryID;
   final String name;
-  final Color headerBackgroundColor;
+  final String? colorHex;
+  final Color? headerBackgroundColor;
   final Color? headerBackgroundColorOpened;
   final Color? headerBorderColor;
   final Color? headerBorderColorOpened;
@@ -21,9 +23,15 @@ class NoteType {
 
   Map<String, dynamic> toMap() {
     return {
-      'category_id': categoryID,
-      'name': name,
+      'id': categoryID,
+      'title': name,
+      'color': colorHex,
     };
+  }
+
+  List get elements {
+    final elements = [name, colorHex];
+    return elements;
   }
 }
 
@@ -67,14 +75,3 @@ NoteType important = const NoteType(
     name: "important",
     headerBackgroundColor: Colors.red,
     leftIcon: Icon(Icons.label_important));
-
-List<NoteType> categories = [defaultType, important];
-
-void createCustomNoteType(Color hBC, String categoryName) {
-  // TODO: Add other parameters, figure out how to use required and optional.
-  categories.add(NoteType(
-    headerBackgroundColor: hBC,
-    categoryID: categories.length,
-    name: categoryName,
-  ));
-}

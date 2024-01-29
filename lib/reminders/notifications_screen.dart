@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:rehearse_app/models/reminder_model.dart';
-import 'package:rehearse_app/notes/dialog_state.dart';
+import 'package:rehearse_app/shared/dialog_state.dart';
 import 'package:rehearse_app/reminders/notifications_state.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/shared/shared.dart';
@@ -303,6 +303,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                                           _databaseHelper
                                                               .getRemindersDatabase();
                                                     });
+                                                    Navigator.of(context).pop();
                                                   }),
                                             ],
                                           );

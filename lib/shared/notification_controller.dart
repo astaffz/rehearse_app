@@ -23,7 +23,7 @@ class RehearseAppNotificationManager {
   }
 
   static Future init() async {
-    const android = AndroidInitializationSettings('app_icon');
+    const android = AndroidInitializationSettings('ic_launcher');
     DarwinInitializationSettings iOS = const DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
