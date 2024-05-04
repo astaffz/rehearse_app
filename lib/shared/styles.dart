@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Colors
+// Forest Theme
+const Color forestBackground = Color(0xFF00795A);
+const Color forestAccentDark = Color(0xFF024F3B);
+const Color forestGreen = Color(0xFF0A4A14);
+const Color forestAccent = Color(0xFF0B9937);
 
+// Colors
 const Color accent = Color(0xFFD6AD60); // Gold
 const Color accentLight = Color(0xFFF4EBD0); //
 const Color heading = Color(0xFFD6AD60); // Cream
 const Color text = Color(0xFFbfded6); // Edgewater
-const Color icon = Color(0xFF046523); // Fun Green (dark)
+const Color icon = Color(0xFF0B9937); // Fun Green (dark)
 const Color background = Color(0xFF122620); // Charcoal
 const Color white = Color(0xFFFFFFFF);
 const Color black = Color(0xFF000000);
@@ -28,6 +33,13 @@ TextStyle pBold = GoogleFonts.poppins(
 TextStyle p1 = GoogleFonts.poppins(color: black, fontSize: 18);
 TextStyle p2 = GoogleFonts.poppins(color: black, fontSize: 16);
 TextStyle p3 = GoogleFonts.poppins(color: black, fontSize: 14);
+
+TextStyle p1Bold = GoogleFonts.poppins(
+    fontSize: 18, fontWeight: FontWeight.w700, color: white);
+TextStyle p2Bold = GoogleFonts.poppins(
+    fontSize: 16, fontWeight: FontWeight.w700, color: white);
+TextStyle p3Bold = GoogleFonts.poppins(
+    fontSize: 14, fontWeight: FontWeight.w700, color: white);
 
 TextStyle dialogText =
     heading2.copyWith(color: black, fontWeight: FontWeight.w800);

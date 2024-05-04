@@ -218,6 +218,21 @@ CREATE TABLE IF NOT EXISTS $tableCategories (
     final List<Map<String, dynamic>> mappedReminders =
         await db!.rawQuery("SELECT * FROM $tableReminders");
 
+    // Checks for and deletes any reminders that (should) have been sent out
+    for (int i = 0; i < mappedReminders.length; i++) {
+      if (DateTime.parse(mappedReminders[i][colDateTime])
+              .compareTo(DateTime.now()) <=
+          0) {
+        Reminder mappedReminder = Reminder(
+          id: mappedReminders[i][columnId],
+          reminderContent: mappedReminders[i][colContent],
+          Iso8601scheduledTime: mappedReminders[i][colDateTime],
+        );
+        deleteReminder(mappedReminder);
+        mappedReminders.removeAt(i);
+      }
+    }
+
     return List.generate(mappedReminders.length, (i) {
       return Reminder(
         id: mappedReminders[i][columnId],

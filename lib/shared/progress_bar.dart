@@ -18,7 +18,7 @@ class ProgressBar extends StatelessWidget {
               Container(
                 height: height,
                 decoration: BoxDecoration(
-                  color: background,
+                  color: black,
                   borderRadius: BorderRadius.all(
                     Radius.circular(height),
                   ),
