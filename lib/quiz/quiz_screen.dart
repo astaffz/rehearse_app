@@ -46,10 +46,15 @@ class _QuizScreenState extends State<QuizScreen> {
                 quiz = snapshot.data ?? const Quiz(noteList: [], questions: []);
 
                 return Scaffold(
+                  backgroundColor: black,
                   appBar: AppBar(
+                    backgroundColor: Colors.black45,
                     title: ProgressBar(value: state.progress),
                     leading: IconButton(
-                      icon: const Icon(FontAwesomeIcons.xmark),
+                      icon: const Icon(
+                        FontAwesomeIcons.xmark,
+                        color: white,
+                      ),
                       onPressed: () => _exitQuiz(state, context),
                     ),
                   ),
@@ -64,7 +69,10 @@ class _QuizScreenState extends State<QuizScreen> {
                     },
                     itemBuilder: (BuildContext context, int idx) {
                       if (idx == 0) {
-                        return StartPage(quiz: quiz);
+                        return StartPage(
+                          quiz: quiz,
+                          questionType: widget.questionType,
+                        );
                       } else if (idx == quiz.questions.length + 1) {
                         return CongratsPage(quiz: quiz);
                       } else {
@@ -116,8 +124,8 @@ class _QuizScreenState extends State<QuizScreen> {
             style: p3.copyWith(color: white),
           ),
           onPressed: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
           },
         ),
       ],
@@ -135,6 +143,7 @@ void _multipleOptionBottomSheet(
   bool scrollControlled = true;
 
   showModalBottomSheet(
+    backgroundColor: Colors.black,
     isDismissible: false,
     enableDrag: false,
     isScrollControlled: scrollControlled,
@@ -229,6 +238,7 @@ void _writtenTestBottomSheet(
   bool scrollControlled = true;
 
   showModalBottomSheet(
+      backgroundColor: black,
       isDismissible: false,
       enableDrag: false,
       isScrollControlled: scrollControlled,
@@ -515,7 +525,8 @@ class MultipleChoiceQuestionPage extends StatelessWidget {
 
 class StartPage extends StatelessWidget {
   final Quiz quiz;
-  const StartPage({super.key, required this.quiz});
+  final QuestionType questionType;
+  const StartPage({super.key, required this.quiz, required this.questionType});
 
   @override
   Widget build(BuildContext context) {
@@ -527,13 +538,16 @@ class StartPage extends StatelessWidget {
         Text("Sve je spremno!", style: pBold),
         Text(
           textAlign: TextAlign.center,
-          "Broj pitanja: ${quiz.questions.length}\nTip pitanja: Višestruki izbor",
+          questionType == QuestionType.multipleChoice
+              ? "Broj pitanja: ${quiz.questions.length}\nTip pitanja: Višestruki izbor"
+              : "Broj pitanja: ${quiz.questions.length}\nTip pitanja: Pisani test",
           style: p2.copyWith(color: white),
         ),
         const SizedBox(
           height: 10,
         ),
         ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: background),
             onPressed: state.nextPage,
             child: Text(
               "Sretno!",
@@ -613,7 +627,7 @@ class CongratsPage extends StatelessWidget {
               style: pBold,
             ),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/notes');
+              Navigator.pop(context);
             },
           )
         ],

@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  final userStream = FirebaseAuth.instance.authStateChanges();
-  final user = FirebaseAuth.instance.currentUser;
+  static final userStream = FirebaseAuth.instance.authStateChanges();
+  static final user = FirebaseAuth.instance.currentUser;
 
-  Future<void> anonLogin() async {
+  static Future<void> anonLogin() async {
     try {
       await FirebaseAuth.instance.signInAnonymously();
     } on FirebaseAuthException {
@@ -13,11 +13,11 @@ class AuthService {
     }
   }
 
-  Future<void> signOut() async {
+  static Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
   }
 
-  Future<void> loginWGoogle() async {
+  static Future<void> loginWGoogle() async {
     try {
       final user = await GoogleSignIn().signIn();
 

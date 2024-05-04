@@ -7,19 +7,28 @@
         {
             "name": "rehearse_app",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "toolArgs": [
+               
+            ]
         },
         {
             "name": "rehearse_app (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "toolArgs": [
+        
+            ]
         },
         {
             "name": "rehearse_app (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "toolArgs": [
+              
+            ]
         }
     ]
 }

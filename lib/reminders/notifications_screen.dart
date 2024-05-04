@@ -86,8 +86,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               context: context,
                                               initialDate:
                                                   state.getAccurateDate(),
-                                              firstDate:
-                                                  state.getAccurateDate(),
+                                              firstDate: DateTime.now(),
                                               lastDate: DateTime(
                                                   DateTime.now().year + 2,
                                                   12,
@@ -347,7 +346,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     onTap: (int idx) {
                       setState(() {
                         pageIndex = idx;
-                        _getUnsentNotifications();
                       });
                     },
                   ));
@@ -405,16 +403,5 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         backgroundColor: Colors.green,
         content: Text("Dogovoreno! U ta doba te zvrcnemo!",
             style: p1.copyWith(color: white)));
-  }
-
-  _getUnsentNotifications() {
-    for (var reminder in reminders) {
-      if (DateTime.parse(reminder.Iso8601scheduledTime)
-              .compareTo(DateTime.now()) <=
-          0) {
-        _databaseHelper.deleteReminder(reminder);
-      }
-    }
-    remindersFuture = _databaseHelper.getRemindersDatabase();
   }
 }

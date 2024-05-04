@@ -1,37 +1,42 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rehearse_app/reader/reader_screen.dart';
 import 'package:rehearse_app/screens/login_screen.dart';
 import 'package:rehearse_app/notes/notebook_screen.dart';
 import 'package:rehearse_app/reminders/notifications_screen.dart';
+import 'package:rehearse_app/screens/settings_screen.dart';
 import 'package:rehearse_app/screens/splash_screen.dart';
 import 'package:rehearse_app/services/auth.dart';
 import 'package:rehearse_app/shared/shared.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    List<String> welcomeMessages = [
-      "Ćao doktore, nastavljaš rasturat'?",
-      "Pozdrav vizionaru, kako oblikuješ budućnost danas?",
-      "Gdje si pobjedniče, osvajaš li svoje bitke danas?",
-      "Gdje si inspiracijo, kako širiš svoju svjetlost danas?",
-      "Ej magijo, kakvo čudo danas nas očekuje?",
-      "Poštovanje kapetane, kuda plovimo danas?",
-      "Gdje si lavino, kakve prepreke danas rušimo?",
-      "Poštovanje velikane, i danas dominiramo?",
-      "Ćao lave, samo nastavi!",
-      "Oho šampionu, i danas punom parom?",
-      "Gdje si zvijezdo, koliko nam danas sijajiš?",
-    ];
-    List<String> options = ["Moji zapisi", "Moji podsjetnici", "Moj reader"];
-    final random = Random();
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  List<String> welcomeMessages = [
+    "Ćao doktore, nastavljaš rasturat'?",
+    "Pozdrav vizionaru, kako oblikuješ budućnost danas?",
+    "Gdje si pobjedniče, osvajaš li svoje bitke danas?",
+    "Gdje si inspiracijo, kako širiš svoju svjetlost danas?",
+    "Ej magijo, kakvo čudo danas nas očekuje?",
+    "Poštovanje kapetane, kuda plovimo danas?",
+    "Gdje si lavino, kakve prepreke danas rušimo?",
+    "Poštovanje velikane, i danas dominiramo?",
+    "Ćao lave, samo nastavi!",
+    "Oho šampionu, i danas punom parom?",
+    "Gdje si zvijezdo, koliko nam danas sijajiš?",
+  ];
+  List<IconData> options = [Icons.notes, Icons.calendar_month];
+  final random = Random();
+  int pageIndex = 0;
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: AuthService().userStream,
+      stream: AuthService.userStream,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         Widget screen;
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -40,36 +45,95 @@ class HomeScreen extends StatelessWidget {
           screen = const LoginScreen();
         } else {
           screen = Scaffold(
-            backgroundColor: icon.withAlpha(200),
+            bottomNavigationBar: BottomNavigationBar(
+              elevation: 4,
+              backgroundColor: forestGreen,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              items: options
+                  .map((e) => BottomNavigationBarItem(
+                      label: e.toString(),
+                      icon: Icon(
+                        e,
+                        color: white,
+                      )))
+                  .toList(),
+              currentIndex: pageIndex,
+            ),
+            backgroundColor: forestAccent,
+            appBar: AppBar(
+              elevation: 4,
+              toolbarHeight: 75,
+              backgroundColor: forestAccent,
+              title: Text("RehearseApp", style: heading1),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/settings');
+                  },
+                  color: white,
+                  iconSize: 35,
+                )
+              ],
+            ),
             body: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // APPBAR - "REHEARSEapp"
-                Padding(
-                  padding: const EdgeInsets.all(35.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      RehearseAppLogo,
-                      Padding(
-                        padding: const EdgeInsets.only(top: 100.0),
-                        child: Text(
-                          welcomeMessages[
-                              random.nextInt(welcomeMessages.length)],
-                          style: heading3.copyWith(color: white),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+                Container(
+                  color: forestGreen,
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 40.0, horizontal: 20),
+                  child: Text(
+                    welcomeMessages[random.nextInt(welcomeMessages.length)],
+                    style: heading3.copyWith(color: white),
+                    textAlign: TextAlign.left,
                   ),
                 ),
-
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Container(
+                      color: forestBackground,
+                      height: 190,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  "Nadolazeći planovi",
+                                  style: pBold,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: forestAccent,
+                                      shape: const RoundedRectangleBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8)),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pushNamed('/notifications');
+                                  },
+                                  child: Text("Pogledaj sve", style: p1Bold))
+                            ]),
+                      ),
+                    ),
+                    Container(
+                      height: 130,
+                      color: background,
+                      //TODO: FILL IN CONTAINER
+                    )
+                  ],
+                )
                 // OPTION-BOX
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: OptionWidget(options: options),
-                ),
               ],
             ),
           );
@@ -95,7 +159,7 @@ class OptionWidget extends StatelessWidget {
         return const NotificationsScreen();
 
       case 2:
-        return const ReaderScreen();
+        return const SettingsScreen();
       default:
         throw Exception("No page selected.");
     }
