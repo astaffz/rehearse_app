@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rehearse_app/screens/login_screen.dart';
 import 'package:rehearse_app/notes/notebook_screen.dart';
 import 'package:rehearse_app/reminders/notifications_screen.dart';
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   .toList(),
               currentIndex: pageIndex,
             ),
-            backgroundColor: forestAccent,
+            backgroundColor: forestGreen,
             appBar: AppBar(
               elevation: 4,
               toolbarHeight: 75,
@@ -91,49 +92,125 @@ class _HomeScreenState extends State<HomeScreen> {
                     textAlign: TextAlign.left,
                   ),
                 ),
-                Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    Container(
-                      color: forestBackground,
-                      height: 190,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  "Nadolazeći planovi",
-                                  style: pBold,
-                                  textAlign: TextAlign.center,
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Stack(
+                    alignment: AlignmentDirectional.bottomEnd,
+                    children: [
+                      Container(
+                        alignment: Alignment.topCenter,
+                        decoration: ShapeDecoration(
+                            color: forestBackground,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3))),
+                        height: 190,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    "Nadolazeći planovi",
+                                    style: pBold,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                              ),
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: forestAccent,
-                                      shape: const RoundedRectangleBorder(),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8)),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamed('/notifications');
-                                  },
-                                  child: Text("Pogledaj sve", style: p1Bold))
-                            ]),
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: forestAccent,
+                                        elevation: 4,
+                                        shape: const RoundedRectangleBorder(),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8)),
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pushNamed('/notifications');
+                                    },
+                                    child: Text("Pogledaj sve", style: p1Bold))
+                              ]),
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 130,
-                      color: background,
-                      //TODO: FILL IN CONTAINER
-                    )
-                  ],
-                )
+                      Container(
+                        height: 130,
+                        color: background,
+                        //TODO: FILL IN CONTAINER
+                      )
+                    ],
+                  ),
+                ),
                 // OPTION-BOX
+                Card(
+                  color: forestAccent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: OverflowBar(children: [
+                      ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: white,
+                            elevation: 0,
+                          ),
+                          child:
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(
+                              FontAwesomeIcons.noteSticky,
+                              size: 30,
+                            ),
+                            Text(
+                              "Zapisi",
+                              style: p1Bold,
+                            )
+                          ])),
+                      ElevatedButton(
+                          onPressed: () {
+                            return null;
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: white,
+                            elevation: 0,
+                          ),
+                          child:
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(
+                              FontAwesomeIcons.calendarCheck,
+                              size: 30,
+                            ),
+                            Text(
+                              "Planer",
+                              style: p1Bold,
+                            )
+                          ])),
+                      ElevatedButton(
+                          onPressed: () {
+                            return null;
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: white,
+                            elevation: 0,
+                          ),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.scanner,
+                                  size: 36,
+                                ),
+                                Text(
+                                  "Scanner",
+                                  style: p1Bold,
+                                )
+                              ])),
+                    ]),
+                  ),
+                )
               ],
             ),
           );
