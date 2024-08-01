@@ -6,7 +6,8 @@ import 'package:rehearse_app/services/app_routes.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/utils/theme.dart';
 import 'package:rehearse_app/shared/shared.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
@@ -49,11 +50,17 @@ class App extends StatefulWidget {
 
   @override
   State<App> createState() => _AppState();
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _AppState? state = context.findAncestorStateOfType<_AppState>();
+    state?.setLocale(newLocale);
+  }
 }
 
 class _AppState extends State<App> {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   DatabaseHelper databaseHelper = DatabaseHelper();
+  Locale? _appLocale;
   @override
   void dispose() {
     super.dispose();
@@ -74,6 +81,12 @@ class _AppState extends State<App> {
     });
   }
 
+  void setLocale(Locale locale) {
+    setState(() {
+      _appLocale = locale;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -87,6 +100,27 @@ class _AppState extends State<App> {
               textDirection: TextDirection.ltr, child: SplashScreen());
         }
         return MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('bs', ''), // English
+            Locale('en', ''), // Spanish
+            Locale('de', ''),
+          ],
+          localeResolutionCallback: (deviceLocale, supportedLocales) {
+            for (var locale in supportedLocales) {
+              if (deviceLocale != null &&
+                  deviceLocale.languageCode == locale.languageCode) {
+                return deviceLocale;
+              }
+            }
+            return supportedLocales.first;
+          },
+          locale: _appLocale,
           debugShowCheckedModeBanner: false,
           routes: appRoutes,
           theme: theme,

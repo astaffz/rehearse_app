@@ -1,0 +1,7 @@
+{
+ "login_internetconnection":"In order to sign up / log in, an internet connection is required. Useful for storing and synchronaising your data on multiple devices.",
+
+ "login_signin": "Sign in",
+ "login_register": "Create an account",
+ "login_noaccount": "I don't need an account"
+}

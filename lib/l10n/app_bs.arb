@@ -1,0 +1,10 @@
+{
+  "login_internetconnection": "Internet konekcija je potrebna pri prijavljivanju ili registriranju. Korisno za skladištenje i sinhronizaciju Vaših podataka sa Vašim drugim uređajima.",
+  "@login_internetconnection": {
+    "description": "Login screen internet connection warning."
+  },
+
+  "login_signin": "Prijavi se",
+  "login_register": "Kreiraj profil",
+  "login_noaccount": "Nije mi potreban profil"
+}

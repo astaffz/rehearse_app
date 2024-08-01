@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rehearse_app/main.dart';
 import 'package:rehearse_app/services/auth.dart';
 import 'package:rehearse_app/shared/shared.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String _chosenLanguage = "bosnian";
+  String _chosenLanguage = "bs";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,13 +43,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
                       value: _chosenLanguage,
                       onChanged: (text) {
-                        setState(() {
-                          _chosenLanguage = text ?? "bosnian";
-                        });
+                        if (text != null) {
+                          App.setLocale(context, Locale(text));
+                          _chosenLanguage = text;
+                        }
                       },
                       items: [
                         DropdownMenuItem(
-                          value: "bosnian",
+                          value: "bs",
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -60,11 +63,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         DropdownMenuItem(
-                          value: "english",
+                          value: "en",
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Image.asset('assets/flag-ba.png'),
+                              Image.asset('assets/flag-en.png'),
                               Text(
                                 'EN',
                                 style: heading4.copyWith(color: black),
@@ -77,36 +80,40 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 RehearseAppLogo,
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const LoginButton(
-                        text: "Prijavi se",
-                        method: AuthService.loginWGoogle,
-                        color: icon,
-                      ),
-                      const LoginButton(
-                        text: "Kreiraj profil",
-                        method: AuthService.loginWGoogle,
-                        image: "assets/rhapp.png",
-                        color: icon,
-                      ),
-                      const LoginButton(
-                        text: "Nije mi potreban profil",
-                        method: AuthService.anonLogin,
-                        color: background,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25.0, vertical: 30.0),
-                        child: Text(
-                          "Internet konekcija je potrebna pri prijavljivanju ili registriranju. Korisno za skladištenje i sinhronizaciju Vaših podataka sa Vašim drugim uređajima.",
-                          style: p3,
-                          softWrap: true,
-                          textAlign: TextAlign.center,
+                Builder(builder: (context) {
+                  return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        LoginButton(
+                          text: AppLocalizations.of(context)!.login_signin,
+                          method: AuthService.loginWGoogle,
+                          color: icon,
                         ),
-                      )
-                    ]),
+                        LoginButton(
+                          text: AppLocalizations.of(context)!.login_register,
+                          method: AuthService.loginWGoogle,
+                          image: "assets/rhapp.png",
+                          color: icon,
+                        ),
+                        LoginButton(
+                          text: AppLocalizations.of(context)!.login_noaccount,
+                          method: AuthService.anonLogin,
+                          color: background,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0, vertical: 30.0),
+                          child: Text(
+                            AppLocalizations.of(context)!
+                                .login_internetconnection,
+                            maxLines: 5,
+                            style: p3,
+                            softWrap: true,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      ]);
+                }),
               ],
             )));
   }
@@ -142,7 +149,7 @@ class LoginButton extends StatelessWidget {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.5),
+                padding: const EdgeInsets.symmetric(horizontal: 25.5),
                 child: Image.asset(
                   image!,
                   width: 30,

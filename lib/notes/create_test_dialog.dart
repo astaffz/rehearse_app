@@ -112,7 +112,6 @@ class _CreateTestDialogState extends State<CreateTestDialog> {
                           labelStyle:
                               pBold.copyWith(color: black, fontSize: 13),
                           deleteIconColor: black),
-                      showClearIcon: true,
                       selectionType: SelectionType.multi,
                       onOptionSelected: (selectedOptions) {
                         selectedCategories = [];
