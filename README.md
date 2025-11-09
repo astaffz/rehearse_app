@@ -1,3 +1,5 @@
-# rehearse_app
+# RehearseApp Redesign
+_UI and UX revamp_
 
-A new Flutter project.
+Changelog:
+* Localisation in English and other languages
