@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rehearse_app/main.dart';
 import 'package:rehearse_app/services/auth.dart';
 import 'package:rehearse_app/shared/shared.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rehearse_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
