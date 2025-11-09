@@ -1,13 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:rehearse_app/firebase_options.dart';
 import 'package:rehearse_app/screens/splash_screen.dart';
 import 'package:rehearse_app/services/app_routes.dart';
 import 'package:rehearse_app/services/database_helper.dart';
 import 'package:rehearse_app/utils/theme.dart';
 import 'package:rehearse_app/shared/shared.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rehearse_app/l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
@@ -15,6 +16,9 @@ void main() async {
   DatabaseHelper databaseHelper = DatabaseHelper();
   tz.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.android,
+  );
   databaseHelper.database;
   runApp(const App());
 }
@@ -26,14 +30,6 @@ extension StringExtension on String {
 }
 
 extension HexColor on Color {
-  String _generateAlpha({required int alpha, required bool withAlpha}) {
-    if (withAlpha) {
-      return alpha.toRadixString(16).padLeft(2, '0');
-    } else {
-      return '';
-    }
-  }
-
   String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
       '${alpha.toRadixString(16).padLeft(2, '0')}'
       '${red.toRadixString(16).padLeft(2, '0')}'
@@ -94,7 +90,9 @@ class _AppState extends State<App> {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          return const Text('error');
+          return Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text(snapshot.error.toString()));
         } else if (snapshot.connectionState == ConnectionState.waiting) {
           return const Directionality(
               textDirection: TextDirection.ltr, child: SplashScreen());

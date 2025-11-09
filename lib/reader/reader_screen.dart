@@ -263,7 +263,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
 class _cameraView extends StatefulWidget {
   const _cameraView({
-    super.key,
     required this.textController,
   });
   final TextEditingController textController;

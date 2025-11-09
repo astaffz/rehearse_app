@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "241553071863",
     "project_id": "rehearse-app",
-    "storage_bucket": "rehearse-app.appspot.com"
+    "storage_bucket": "rehearse-app.firebasestorage.app"
   },
   "client": [
     {
@@ -13,6 +13,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "241553071863-7v9ghcm640lrfv60f8hgv9e4vpjhkcr7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gelegenheit.rehearseapp",
+            "certificate_hash": "601840999250c2698a2770ba13aee5f9aae41ca3"
+          }
+        },
         {
           "client_id": "241553071863-kops8o5tv1ei526b9p1204cv65jhnjuq.apps.googleusercontent.com",
           "client_type": 3

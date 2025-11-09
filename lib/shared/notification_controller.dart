@@ -51,11 +51,14 @@ class RehearseAppNotificationManager {
       required String body,
       String? payload,
       required DateTime date}) async {
-    _notificationsPlugin.zonedSchedule(id, title, body,
-        tz.TZDateTime.from(date, tz.local), await _notificationDetails(),
-        payload: payload,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+    _notificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      tz.TZDateTime.from(date, tz.local),
+      await _notificationDetails(),
+      payload: payload,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   }
 }

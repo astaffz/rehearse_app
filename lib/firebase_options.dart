@@ -50,21 +50,22 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: String.fromEnvironment("ANDROID_FIREBASE_API_KEY"),
+    apiKey: 'AIzaSyAHn1CN9DIZKmmZxuEia_UNVw9pKU-V02U',
     appId: '1:241553071863:android:42c953980b05033c597df2',
     messagingSenderId: '241553071863',
     projectId: 'rehearse-app',
-    storageBucket: 'rehearse-app.appspot.com',
+    storageBucket: 'rehearse-app.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: String.fromEnvironment("IOS_FIREBASE_API_KEY"),
+    apiKey: 'AIzaSyCHZBmTciCbBhQMts2qGVbVZtUxlzD61qI',
     appId: '1:241553071863:ios:a366893875903363597df2',
     messagingSenderId: '241553071863',
     projectId: 'rehearse-app',
-    storageBucket: 'rehearse-app.appspot.com',
-    iosClientId:
-        '241553071863-pdin6k5hcc6i5lj9ms91ksojplvi3shh.apps.googleusercontent.com',
+    storageBucket: 'rehearse-app.firebasestorage.app',
+    androidClientId: '241553071863-7v9ghcm640lrfv60f8hgv9e4vpjhkcr7.apps.googleusercontent.com',
+    iosClientId: '241553071863-pdin6k5hcc6i5lj9ms91ksojplvi3shh.apps.googleusercontent.com',
     iosBundleId: 'com.gelegenheit.rehearseApp',
   );
+
 }
